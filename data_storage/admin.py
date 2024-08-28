@@ -80,6 +80,7 @@ class TreatmentLevelAdmin(admin.ModelAdmin):
 class TrialTreatment(admin.ModelAdmin):
     list_display = ['trial_id', 'treatment_id']
     list_filter = ['trial_id', 'treatment_id']
+    search_fields = ['trial_id']
     ordering = ['trial_id', 'treatment_id']
 
 # Germplasm Models
@@ -88,8 +89,20 @@ admin.site.register(Germplasm)
 admin.site.register(GermplasmAlias)
 
 # Plot Models
-admin.site.register(Plot)
-admin.site.register(PlotCrop)
+@admin.register(Plot)
+class PlotAdmin(admin.ModelAdmin):
+    list_display = ['label', 'trial_id', 'block', 'type', 'width_m', 'length_m', 'parent_plot_id', 'location_id']
+    list_filter = ['trial_id', 'block', 'type', 'parent_plot_id']
+    search_fields = ['trial_id', 'label', 'location_id']
+    ordering = ['trial_id', 'label', 'type']
+
+@admin.register(PlotCrop)
+class PlotCropAdmin(admin.ModelAdmin):
+    list_display = ['plot_id', 'plot_year', 'germplasm_id']
+    list_filter = ['plot_year', 'germplasm_id']
+    search_fields = ['plot_year', 'plot_id', 'germplasm_id']
+    ordering = ['plot_year', 'plot_id']
+
 admin.site.register(PlotTreatment)
 
 # Ontological Models

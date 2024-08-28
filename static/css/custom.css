@@ -1,0 +1,69 @@
+/* All custom css styles */
+:root {
+    --primary-color: #ECEFF4; /* Light Background */
+    --secondary-color: #D8DEE9; /* Light Secondary Background */
+    --button-background-color: #8FBCBB;
+    --background-color: #2E3440; /* Dark Text */
+    --text-color: #2E3440; /* Dark Text */
+}
+
+[data-theme="dark"] {
+    --primary-color: #2E3440; /* Dark Background */
+    --secondary-color: #3B4252; /* Dark Secondary Background */
+    --background-color: #ECEFF4; /* Light Text */
+    --text-color: #D8DEE9; /* Light Text */
+}
+
+body {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    padding-top: 65px; 
+}
+
+.navbar, .sidebar {
+    background-color: var(--primary-color);
+}
+
+/* .navbar-brand, .nav-link {
+    color: var(--text-color);
+} */
+
+/* .navbar-brand:hover {
+    background-color: var(--button-background-color);
+    color: var(--primary-color)
+} */
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff; /* Change this to your desired hover color */
+    background-color: #343a40; /* Match the dropdown background color */
+    border-radius: 0.25rem; /* Optional: add some rounding */
+}
+
+.main {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.btn-outline-light {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-light:hover {
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    border-color: var(--background-color);
+}
+
+.btn-outline-dark {
+    color: var(--text-color);
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+}
+
+.btn-outline-dark:hover {
+    color: var(--primary-color);
+    background-color: var(--background-color);
+    border-color: var(--background-color)
+}

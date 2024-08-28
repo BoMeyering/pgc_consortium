@@ -246,7 +246,23 @@ class Command(BaseCommand):
 
         # Populate Plots
         if not Plot.objects.exists():
+            trial = Trial.objects.get(name='FABPGC_TLI_keystone')
             plot_list = pd.read_csv('data_storage/keystone_plot_list.csv')
-            print(plot_list)
+            nrow = len(plot_list)
+            for i in range(nrow):
+                row = plot_list.loc[i]
+                try:
+                    parent_plot = Plot.objects.get(label=row.parent_plot_id)
+                except Plot.DoesNotExist:
+                    parent_plot = None
+                Plot.objects.create(
+                    trial_id=trial, 
+                    block=row.block,
+                    label=row.label,
+                    type=row.type,
+                    width_m=row.width_m,
+                    length_m=row.length_m,
+                    parent_plot_id=parent_plot
+                )
 
         self.stdout.write(self.style.SUCCESS('Successfully populated initial data'))

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Location Paginator{% endblock %}
+
+{% block content %}
+    <div class="row col-md-4">
+        <div class="col-md-3">
+            Location Name
+        </div>
+        <div class="col-md-3">
+            Type
+        </div>
+        <div class="col-md-3">
+            Latitude
+        </div>
+        <div class="col-md-3">
+            Longitude
+        </div>
+    </div>
+    {% for location in locations %}
+        <div class="row col-md-4">
+            <div class="col-md-3">
+                {{ location.name }}
+            </div>
+            <div class="col-md-3">
+                {{ location.type }}
+            </div>
+            <div class="col-md-3">
+                {{ location.latitude }}
+            </div>
+            <div class="col-md-3">
+                {{ location.longitude }}
+            </div>
+        </div>
+    {% endfor %}
+    {% include "paginator.html" with page=page_obj%}
+{% endblock %}

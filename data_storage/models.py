@@ -18,6 +18,8 @@ from datetime import date
 from phonenumber_field.modelfields import PhoneNumberField
 from enum import Enum
 
+
+""" ID Functions """
 def generate_ksuid():
     """
     Generate a K-Sorted Universal ID
@@ -80,18 +82,22 @@ class TreatmentType(models.TextChoices):
     HERBICIDE = 'herbicide', 'Herbicide'        # different herbicides, rates, etc.
     OTHER = 'other', 'Other'                    # Everything else.
 
-class GermplasmType(Enum):
+class LocationType(models.TextChoices):
+    """
+    Enumeration for all location types
+    """
+    
+    PLOT = 'plot', 'Plot'
+    TRIAL = 'trial', 'Trial'
+    GENERAL = 'general', 'General'
+
+class GermplasmType(models.TextChoices):
     """
     Enumerate all of the germplasm types
     """
 
-    PGC = 'pgc'
-    CROP = 'crop'
-
-
-    @classmethod
-    def choices(cls):
-        return [(key.value, key.name.capitalize()) for key in cls]
+    PGC = 'pgc', 'PGC'
+    CROP = 'crop', 'Crop'
 
 """ Metadata Models"""
 class AttributeType(models.Model):
@@ -118,17 +124,16 @@ class Location(models.Model):
     Location model for plots, trial, and general locations
     """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
-    type = models.CharField(
-        null=False, 
-        choices=[
-            ('plot', 'Plot'),
-            ('trial', 'Trial'),
-            ('general', 'General')
-        ]
-    )
+    type = models.CharField(null=False, choices=LocationType)
+
+    def get_absolute_url(self):
+        return reverse(
+            'data_storage:show_location',
+            args=[self.db_id]
+        )
 
     def __str__(self):
         return f"{self.name} - {self.latitude, self.longitude}"
@@ -180,7 +185,7 @@ class Organization(models.Model):
     abbreviation = models.CharField(blank=False, null=False, unique=True)
     address_id = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=False)
     ror_id = models.CharField(
-        max_length=30,  # Adjust max_length based on the ROR ID format
+        max_length=30,
         validators=[
             RegexValidator(
                 regex=r'^https://ror\.org/[a-zA-Z0-9]{9}$',
@@ -199,9 +204,9 @@ class Person(models.Model):
     FK on Organization
     """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
-    first_name = models.CharField()
-    last_name = models.CharField()
-    middle_initial = models.CharField(max_length=1, null=False)
+    first_name = models.CharField(max_length=255, blank=False, null=False)
+    last_name = models.CharField(max_length=255, blank=False, null=False)
+    middle_initial = models.CharField(max_length=1)
     affiliation_id = models.ForeignKey(Organization, on_delete=models.CASCADE)
     orcid = models.CharField(max_length=19, blank=True, null=True)
     email = models.EmailField(unique=True, blank=True, null=True)
@@ -366,12 +371,12 @@ class CommonName(models.Model):
 
 class Germplasm(models.Model):
     """
-    Germplasm model
+    Germplasm modelto hold metadata regarding a specific type pf germplasm
     FK on CommonName
     """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
     name = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    type = models.CharField(max_length=255, choices=GermplasmType.choices())
+    type = models.CharField(max_length=255, choices=GermplasmType)
     common_name_id = models.ForeignKey(CommonName, on_delete=models.SET_NULL, null=True, blank=False)
     genus = models.CharField(max_length=255, blank=False, null=False)
     species = models.CharField(max_length=255, blank=False, default='spp.')
@@ -412,9 +417,11 @@ class Plot(models.Model):
         blank=False, 
         related_name='plots'
     )
-    block = models.CharField(max_length=50, blank=True, null=True)
-    label = models.CharField(max_length=255, blank=False, null=False, unique=True)
+    label = models.CharField(max_length=255, blank=False, null=False)
     type = models.CharField(choices=PlotType, blank=False, null=False)
+    block = models.CharField(max_length=50, blank=True, null=True)
+    row = models.CharField(max_length=10, blank=True, null=True)
+    column = models.CharField(max_length=10, blank=True, null=True)
     width_m = models.DecimalField(
         max_digits=10, 
         decimal_places=4, 
@@ -424,11 +431,6 @@ class Plot(models.Model):
         max_digits=10, 
         decimal_places=4, 
         help_text='The length of the plot object in meters.'
-    )
-    area_m2 = models.DecimalField(
-        max_digits=12, 
-        decimal_places=4, 
-        help_text='The area of the plot object in square meters.'
     )
     parent_plot_id = models.ForeignKey(
         'self', 
@@ -445,25 +447,14 @@ class Plot(models.Model):
         blank=True
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['trial_id', 'label'], name='plot_trial_unique_constraint')
+        ]
+
     def __str__(self):
         return f"{self.trial_id.name} - {self.label} "
     
-    # cropId=models.ForeignKey(
-    #     Germplasm, 
-    #     blank=True, 
-    #     null=True, 
-    #     on_delete=models.SET_NULL, 
-    #     limit_choices_to={'germplasmType': 'crop'}, 
-    #     related_name='crop_plot'
-    # )
-    # pgcId=models.ForeignKey(
-    #     Germplasm, 
-    #     null=True, 
-    #     on_delete=models.SET_NULL, 
-    #     limit_choices_to={'germplasmType': 'pgc'}, 
-    #     related_name='pgc_plot'
-    # )
-
 class PlotCrop(models.Model):
     """
     Plot Crop join table
@@ -501,31 +492,65 @@ class PlotTreatment(models.Model):
 
 """ Ontological Terms """
 class TraitEntity(models.Model):
+    """
+    Entity model holds the label information about a specific trait entity object
+    """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    pass
+    external_ontology_reference = models.URLField(null=True, blank=True)
+    
+    def __str__(self):
+        return self.label
 
 class TraitAttribute(models.Model):
+    """
+    Attribute model holds the label information about a specific trait attribute object
+    """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    pass
+    external_ontology_reference = models.URLField(null=True, blank=True)
+    
+    def __str__(self):
+        return self.label
 
 class VarTrait(models.Model):
+    """
+    Trait model holds the specific trait identity for a given variable.
+    FK on TraitEntity
+    FK on TraitAttrribute
+    """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     entity_id = models.ForeignKey(TraitEntity, on_delete=models.CASCADE, blank=False, null=False)
     attribute_id = models.ForeignKey(TraitAttribute, on_delete=models.CASCADE, blank=False, null=False)
-    pass
+    external_ontology_reference = models.URLField(null=True, blank=True)
+    
+    def __str__(self):
+        return self.label
 
 class VarMethod(models.Model):
+    """
+    Method model holds variable method label and descriptions
+    """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    pass
+    description = models.TextField(max_length=500)
+    external_ontology_reference = models.URLField(null=True, blank=True)
+    
+    def __str__(self):
+        return self.label
 
 class VarScale(models.Model):
+    """
+    Scale model holds variable scale label and descriptions
+    """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    pass
+    description = models.TextField(max_length=500)
+    external_ontology_reference = models.URLField(null=True, blank=True)
+    
+    def __str__(self):
+        return self.label
 
 class Variable(models.Model):
     """
@@ -551,17 +576,33 @@ class Variable(models.Model):
 """ Observation Tables """
 class Observation(models.Model):
     """
-    Observation model
+    Observation model to connect observations with Person(s) PlotCrop records, and variables
     FK1 on Person
     FK2 on PlotCrop
     FK3 on Variable
     """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
-    date = models.DateField(blank=False, null=False)
+    date_time = models.DateTimeField(blank=False, null=False)
     observer_id = models.ForeignKey(Person, on_delete=models.CASCADE, blank=False, null=False)
     plot_crop_id = models.ForeignKey(PlotCrop, on_delete=models.CASCADE, blank=False, null=False)
     variable_id = models.ForeignKey(Variable, to_field='label', on_delete=models.CASCADE)
     value = models.CharField(max_length=255, null=False)
+
+    def clean(self):
+        super().clean()
+
+        variable = self.variable_id
+
+        if variable.min_value:
+            if self.value < variable.min_value:
+                raise ValidationError(
+                    {'value': _(f"The observation value cannot be less than the variable {variable}'s minimum allowed value ({variable.min_value})")}
+                )
+        if variable.max_value:
+            if self.value > variable.max_value:
+                raise ValidationError(
+                    {'value': _(f"The observation value cannot be less than the variable {variable}'s maximum allowed value ({variable.max_value})")}
+                )
 
     def __str__(self):
         return f"{self.plotId} - {self.variable}: {self.value}"
@@ -569,7 +610,7 @@ class Observation(models.Model):
 """ AWS Models """
 class AwsModel(models.Model):
     """
-    AWS Model structure
+    AWS Model structure to record all different AWS models in the system
     """
     db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
     name = models.CharField(max_length=255, null=False, blank=False)
