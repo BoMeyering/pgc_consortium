@@ -2,6 +2,7 @@
 import uuid
 from ksuid import Ksuid
 import os
+from functools import partial
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -12,11 +13,13 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 
+from charidfield import CharIDField
 
 from datetime import date
 
 from phonenumber_field.modelfields import PhoneNumberField
 from enum import Enum
+
 
 
 """ ID Functions """
@@ -25,6 +28,13 @@ def generate_ksuid():
     Generate a K-Sorted Universal ID
     """
     return str(Ksuid())
+
+KsuidField = partial(
+    CharIDField,
+    default=Ksuid,
+    max_length=50,
+    help_text='ksuid formatter for this entity.'
+)
 
 """ Enumerations """    
 class VariableType(models.TextChoices):
@@ -105,7 +115,7 @@ class AttributeType(models.Model):
     REVAMP THIS MODEL AND REVISIT LATER
     Miscellaneous attribute model
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='attr_')
     label = models.CharField(null=False, blank=False)
     abbreviation = models.CharField(null=False, blank=False)
     description = models.TextField(null=False, blank=False)
@@ -123,7 +133,7 @@ class Location(models.Model):
     """
     Location model for plots, trial, and general locations
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='loc_')
     name = models.CharField(max_length=255, unique=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
@@ -142,7 +152,7 @@ class State(models.Model):
     """
     State model to be populated with all 50 US states
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='state_')
     name = models.CharField(max_length=255, null=False, unique=True)
     abbreviation = models.CharField(max_length=255, null=False, unique=True)
 
@@ -154,7 +164,7 @@ class Address(models.Model):
     Address to handle address objects for organizations
     FK on State
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='addr_')
     name = models.CharField(max_length=255, unique=True, blank=False, null=False)
     address_line_1 = models.CharField(max_length=255, blank=False, null=False)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
@@ -180,7 +190,7 @@ class Organization(models.Model):
     Organization model for different research institutions, companies, and groups
     FK on Address
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='org_')
     name = models.CharField(blank=False, null=False, unique=True)
     abbreviation = models.CharField(blank=False, null=False, unique=True)
     address_id = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=False)
@@ -203,7 +213,7 @@ class Person(models.Model):
     Person model
     FK on Organization
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='person_')
     first_name = models.CharField(max_length=255, blank=False, null=False)
     last_name = models.CharField(max_length=255, blank=False, null=False)
     middle_initial = models.CharField(max_length=1)
@@ -220,7 +230,7 @@ class Project(models.Model):
     """
     Project model to handle trial groupings into a project
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='proj_')
     name = models.CharField(unique=True, null=False)
     description = models.TextField(blank=False, null=False)
     funding = models.CharField(max_length=255)
@@ -244,7 +254,7 @@ class Trial(models.Model):
     """
     YEAR_CHOICES = [(r, str(r)) for r in range(1970, date.today().year + 1)]
     
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='trial_')
     name = models.CharField(unique=True, null=False)
     location_id = models.ForeignKey(
         Location, 
@@ -268,7 +278,7 @@ class TrialYear(models.Model):
     """
     YEAR_CHOICES = [(r, str(r)) for r in range(1900, date.today().year + 1)]
 
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='trialYear_')
     trial_id = models.ForeignKey(Trial, on_delete=models.CASCADE, blank=False, null=False)
     year = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year)
 
@@ -295,10 +305,12 @@ class TrialAttribute(models.Model):
     Trial Attribute model
     FK on Trial
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='trialAttr_')
     trial_id = models.ForeignKey(Trial, blank=False, null=False, on_delete=models.CASCADE)
     key = models.CharField(max_length=255, blank=False, null=False)
     value = models.CharField(max_length=255, blank=False, null=False)
+    date = models.DateField(max_length=255)
+    description = models.TextField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return f"{self.key}: {self.value}"
@@ -308,7 +320,7 @@ class Treatment(models.Model):
     """
     Treatment model for the main treatment group
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='treatment_')
     name = models.CharField(max_length=255, unique=True, blank=False, null=False)
     type = models.CharField(max_length=255, choices=TreatmentType)
     description = models.TextField(max_length=500, blank=False, null=False)
@@ -327,7 +339,7 @@ class TreatmentLevel(models.Model):
     Treatment Level model for set factors of a given treatment
     FK on Treatment
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='treatmentLevel_')
     treatment_id = models.ForeignKey(Treatment, on_delete=models.CASCADE)
     level = models.CharField(max_length=255, null=False)
 
@@ -346,7 +358,7 @@ class TrialTreatment(models.Model):
     FK2 on Treatment
     Composite key constraint on Trial and Treatment
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='trialTreatment_')
     trial_id = models.ForeignKey(Trial, on_delete=models.CASCADE, blank=False, null=False)
     treatment_id = models.ForeignKey(Treatment, on_delete=models.CASCADE, blank=False, null=False)
 
@@ -363,7 +375,7 @@ class CommonName(models.Model):
     """
     Common name model to hold the common name of a crop.
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='commonName_')
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -374,7 +386,7 @@ class Germplasm(models.Model):
     Germplasm modelto hold metadata regarding a specific type pf germplasm
     FK on CommonName
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='germ_')
     name = models.CharField(max_length=255, unique=True, blank=False, null=False)
     type = models.CharField(max_length=255, choices=GermplasmType)
     common_name_id = models.ForeignKey(CommonName, on_delete=models.SET_NULL, null=True, blank=False)
@@ -389,7 +401,7 @@ class GermplasmAlias(models.Model):
     Germplasm Alias model to handle other germplasm names that might appear
     FK on Germplasm
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='germAlias_')
     germplasm_id = models.ForeignKey(Germplasm, on_delete=models.CASCADE, blank=False, null=False)
     alias = models.CharField(max_length=255)
 
@@ -409,7 +421,7 @@ class Plot(models.Model):
     FK2 on Trial
     FK3 on Location
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='plot_')
     trial_id = models.ForeignKey(
         Trial, 
         on_delete=models.CASCADE, 
@@ -464,7 +476,7 @@ class PlotCrop(models.Model):
     """
     YEAR_CHOICES = [(r, str(r)) for r in range(1900, date.today().year + 1)]
 
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='plotCrop_')
     plot_id = models.ForeignKey(Plot, on_delete=models.CASCADE, blank=False, null=False)
     germplasm_id = models.ForeignKey(Germplasm, on_delete=models.CASCADE, blank=False, null=False)
     plot_year = models.CharField(max_length=4, choices=YEAR_CHOICES, default=date.today().year)
@@ -483,7 +495,7 @@ class PlotTreatment(models.Model):
     FK1 on Plot
     FK2 on TreatmentLevel
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='plotTreatment_')
     plot_crop_id = models.ForeignKey(PlotCrop, on_delete=models.CASCADE, blank=False, null=False)
     treatment_level_id = models.ForeignKey(TreatmentLevel, on_delete=models.CASCADE, blank=False, null=False)
 
@@ -495,7 +507,7 @@ class TraitEntity(models.Model):
     """
     Entity model holds the label information about a specific trait entity object
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='traitEntity_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     external_ontology_reference = models.URLField(null=True, blank=True)
     
@@ -506,7 +518,7 @@ class TraitAttribute(models.Model):
     """
     Attribute model holds the label information about a specific trait attribute object
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='traitAttr_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     external_ontology_reference = models.URLField(null=True, blank=True)
     
@@ -519,7 +531,7 @@ class VarTrait(models.Model):
     FK on TraitEntity
     FK on TraitAttrribute
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='varTrait_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     entity_id = models.ForeignKey(TraitEntity, on_delete=models.CASCADE, blank=False, null=False)
     attribute_id = models.ForeignKey(TraitAttribute, on_delete=models.CASCADE, blank=False, null=False)
@@ -532,7 +544,7 @@ class VarMethod(models.Model):
     """
     Method model holds variable method label and descriptions
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='varMethod_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     description = models.TextField(max_length=500)
     external_ontology_reference = models.URLField(null=True, blank=True)
@@ -544,7 +556,7 @@ class VarScale(models.Model):
     """
     Scale model holds variable scale label and descriptions
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='varScale_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     description = models.TextField(max_length=500)
     external_ontology_reference = models.URLField(null=True, blank=True)
@@ -559,7 +571,7 @@ class Variable(models.Model):
     Fk2 on VarMethod
     FK3 on VarScale
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='variable_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     abbreviation = models.CharField(max_length=255, unique=True, blank=False, null=False)
     trait_id = models.ForeignKey(VarTrait, on_delete=models.CASCADE, blank=False, null=False)
@@ -573,6 +585,34 @@ class Variable(models.Model):
     def __str__(self):
         return f"{self.label} - ({self.abbreviation})"
 
+class AgroProcess(models.Model):
+    """
+    Agronomic process model
+    """
+    db_id = KsuidField(primary_key=True, editable=False, prefix='agroProcess_')
+    label = models.CharField(max_length=255, unique=True, blank=False, null=False)
+    description = models.TextField(max_length=500, null=False, blank=False)
+    external_id = models.CharField(max_length=255, null=False, blank=False)
+    external_reference = models.URLField()
+
+    def __str__(self):
+        return self.label
+    
+class TrialEvent(models.Model):
+    """
+    Trial Event model, tracks trial level agronomic processes and dates
+    FK1 on Trial
+    FK2 on AgroProcess
+    """
+    db_id = KsuidField(primary_key=True, editable=False, prefix='trialEvent_')
+    trial_id = models.ForeignKey(Trial, on_delete=models.CASCADE, blank=False, null=False)
+    process_id = models.ForeignKey(AgroProcess, on_delete=models.CASCADE, blank=False, null=False)
+    date = models.DateField(blank=False, null=False)
+    comment = models.TextField(max_length=500, blank=False, null=False)
+
+    def __str__(self):
+        return f"{self.trial_id.name} - {self.process_id.label}"
+
 """ Observation Tables """
 class Observation(models.Model):
     """
@@ -581,7 +621,7 @@ class Observation(models.Model):
     FK2 on PlotCrop
     FK3 on Variable
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='observation_')
     date_time = models.DateTimeField(blank=False, null=False)
     observer_id = models.ForeignKey(Person, on_delete=models.CASCADE, blank=False, null=False)
     plot_crop_id = models.ForeignKey(PlotCrop, on_delete=models.CASCADE, blank=False, null=False)
@@ -612,7 +652,7 @@ class AwsModel(models.Model):
     """
     AWS Model structure to record all different AWS models in the system
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='awsModel_')
     name = models.CharField(max_length=255, null=False, blank=False)
     version = models.CharField(max_length=255, null=False, blank=False)
     description = models.TextField(max_length=500, blank=False, null=False)
@@ -627,7 +667,7 @@ class Image(models.Model):
     Image model for determining the structure of images connected to a specific observation
     FK on Observation
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='image_')
     filename = models.CharField(
         max_length=255, 
         blank=False, 
@@ -665,7 +705,7 @@ class ImageOperation(models.Model):
     FK1 on Image
     FK2 on AwsModel
     """
-    db_id = models.CharField(default=Ksuid, primary_key=True, editable=False, unique=True)
+    db_id = KsuidField(primary_key=True, editable=False, prefix='imageOperation_')
     image_id = models.ForeignKey(Image, on_delete=models.CASCADE, blank=False, null=False)
     model_id = models.ForeignKey(AwsModel, on_delete=models.CASCADE, blank=False, null=False)
     date_time = models.DateTimeField(auto_now_add=True, blank=False, null=False)

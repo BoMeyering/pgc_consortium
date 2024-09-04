@@ -18,25 +18,36 @@ body {
     background-color: var(--primary-color);
     color: var(--text-color);
     padding-top: 65px; 
+    /* margin-bottom: 165px; */
+    
 }
 
-.navbar, .sidebar {
+main {
+    margin-bottom: 140px;
+}
+
+.navbar, .sidebar, .footer {
     background-color: var(--primary-color);
 }
-
-/* .navbar-brand, .nav-link {
-    color: var(--text-color);
-} */
-
-/* .navbar-brand:hover {
-    background-color: var(--button-background-color);
-    color: var(--primary-color)
-} */
 
 .navbar-nav .nav-link:hover {
     color: #ffffff; /* Change this to your desired hover color */
     background-color: #343a40; /* Match the dropdown background color */
     border-radius: 0.25rem; /* Optional: add some rounding */
+}
+
+.navbar .dropdown-menu {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Show the dropdown when hovering over the parent */
+.navbar .dropdown:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
 }
 
 .main {

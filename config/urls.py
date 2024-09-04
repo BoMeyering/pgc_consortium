@@ -20,9 +20,11 @@ from data_storage import views as ds_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', ds_views.index_view, name='index'),
     path('ontology/', include('ontology.urls', namespace='ontology')),
     path('data-storage/', include('data_storage.urls', namespace='data_storage')),
     path('imaging/', include('imaging.urls', namespace='imaging')),
-    path('resources/', include('resources.urls', namespace='resources'))
+    path('resources/', include('resources.urls', namespace='resources')),
+    path('api/', include('api.urls', namespace='api'))
 ]

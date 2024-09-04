@@ -259,6 +259,39 @@
         </main>
     </div>
 
+    <div class="w-100">
+        <footer class="fixed-bottom py-2 my-0 bg-dark">
+          <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+            <li class="nav-item">
+                <a href="{% url 'resources:resource_index' %}" class="nav-link link-light px-2 text-body-primary">
+                    Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'resources:resource_index' %}" class="nav-link link-light px-2 text-body-primary">
+                    Features
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'resources:resource_index' %}" class="nav-link link-light px-2 text-body-primary">
+                    FAQs
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'resources:resource_index' %}" class="nav-link link-light px-2 text-body-primary">
+                    About
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'resources:contact_us' %}" class="nav-link link-light px-2 text-body-primary">
+                    Contact
+                </a>
+            </li>
+          </ul>
+          <p class="text-center navbar-dark navbar-brand">&copy; 2024 PGC Consortium</p>
+        </footer>
+      </div>
+
     <script>
         const switcher = document.getElementById('theme-switcher');
         const currentTheme = localStorage.getItem('theme') || 'light';
@@ -277,7 +310,6 @@
             } else {
                 switcher.classList.replace('btn-outline-light', 'btn-outline-dark');
             }
-            
         });
     </script>
 </body>

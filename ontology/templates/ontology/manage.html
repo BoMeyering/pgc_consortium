@@ -7,6 +7,108 @@
     <h1>
         Manage Ontologies
     </h1>
+    <div class="container-fluid">
+        {% if add_vars %}
+            <p>
+                Looks like you don't have any variables in the database right now. Let's add some!
+            </p>
+            <button class="btn btn-dark">
+                <a class='link-light' href="#">
+                    Add Variables                    
+                </a>
+            </button>
+        {% else %}
+            <h2>
+                Corn Variables
+            </h2>
+            {% if corn_variables %}
+                {% for var in corn_variables %}
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="col">
+                            <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ var }}</h5>
+                                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>
+                    No variables are currently associated with 'Corn'
+                </p>
+            {% endif %}
+            <h2>
+                Soybean Variables
+            </h2>
+            {% if soybean_variables %}
+                {% for var in soybean_variables %}
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="col">
+                            <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ var }}</h5>
+                                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>
+                    No variables are currently associated with 'Soybean'
+                </p>
+            {% endif %}
+            <h2>
+                PGC Variables
+            </h2>
+            {% if pgc_variables %}
+                {% for var in pgc_variables %}
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="col">
+                            <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ var }}</h5>
+                                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>
+                    No variables are currently associated with 'PGC'
+                </p>
+            {% endif %}
+            <h2>
+                Soil Variables
+            </h2>
+            {% if soil_variables %}
+                {% for var in soil_variables %}
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="col">
+                            <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ var }}</h5>
+                                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>
+                    No variables are currently associated with 'Soil'
+                </p>
+
+            {% endif %}
+        {% endif %}
+    </div>
     <p>
         Lorem ipsum odor amet, consectetuer adipiscing elit. Platea erat est sem vitae odio cras malesuada conubia consectetur. Ipsum sit fusce faucibus malesuada aliquam eu mollis. Senectus nulla facilisis metus feugiat augue. Quam taciti eleifend litora volutpat eu placerat iaculis nulla. Felis fames quis ligula congue potenti conubia. Faucibus pretium egestas maximus vestibulum finibus vivamus leo. Metus turpis sodales facilisi vehicula primis. Nisi torquent quis lectus urna nam finibus per.
     </p>
