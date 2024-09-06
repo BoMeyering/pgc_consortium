@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from data_storage.models import CommonName, Variable
+from .models import Variable
+from data_storage.models import CommonName
+
 
 # Create your views here.
 def list_variables(request):

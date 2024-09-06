@@ -12,8 +12,8 @@ from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 # from drf_spectacular.utils import extend_schema
 
-
-from data_storage.models import Person, Plot
+from resources.models import Person
+from data_storage.models import Plot
 from api.serializers import PersonSerializer, PlotSerializer
 from api.responses import ApiResponse
 

@@ -3,7 +3,8 @@ API Serializers
 """
 
 from rest_framework import serializers
-from data_storage.models import Person, Plot
+from resources.models import Person
+from data_storage.models import Plot
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:

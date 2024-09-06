@@ -4,9 +4,10 @@ Initial PostgreSQL DB Population
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.contrib.auth.models import User
-from data_storage.models import State, Address, Organization, Person, Project, Trial, Location
-from data_storage.models import TrialYear, TrialAttribute, Treatment, TreatmentLevel, TrialTreatment
-from data_storage.models import Plot
+from resources.models import Attribute, Location, State, Address, Organization, Person, Project
+from data_storage.models import Trial, TrialYear, TrialAttribute, TrialEvent
+from data_storage.models import Treatment, TreatmentLevel, TrialTreatment
+from data_storage.models import Plot, PlotCrop, PlotTreatment, PlotType
 from faker import Faker
 import random
 import pandas as pd

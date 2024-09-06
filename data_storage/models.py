@@ -1,8 +1,11 @@
+"""
+Data Storage Models
+"""
 
-import uuid
-from ksuid import Ksuid
-import os
-from functools import partial
+# Standard imports
+from datetime import date
+
+# Django imports
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -13,238 +16,14 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 
-from charidfield import CharIDField
-
-from datetime import date
-
+# External imports
 from phonenumber_field.modelfields import PhoneNumberField
-from enum import Enum
 
+# App imports
+from config.enumerations import AttributeDomainType, PlotType, TreatmentType, LocationType, GermplasmType
+from config.custom_fields import KsuidField
 
-
-""" ID Functions """
-def generate_ksuid():
-    """
-    Generate a K-Sorted Universal ID
-    """
-    return str(Ksuid())
-
-KsuidField = partial(
-    CharIDField,
-    default=Ksuid,
-    max_length=50,
-    help_text='ksuid formatter for this entity.'
-)
-
-""" Enumerations """    
-class VariableType(models.TextChoices):
-    """
-    Enumerate the different variable types
-    """
-    CORN = 'corn', 'Corn'
-    SOYBEAN = 'soybean', 'Soybean'
-    PGC_GRASS = 'pgc grass', 'PGC Grass'
-    PGC_CLOVER = 'pgc clover', 'PGC Clover'
-    WEED = 'weed', 'Weed'
-    SOIL = 'soil', 'Soil'
-    
-class StatusType(models.TextChoices):
-    """
-    Enumerate all status types
-    """
-
-    SUCCESS = 'success', 'Success'
-    IN_PROGRESS = 'in progress', 'In Progress'
-    FAILURE = 'failure', 'Failure'
-    
-class AttributeDomainType(models.TextChoices):
-    """
-    Enumerate all the things!
-    """
-
-    TRIAL = 'trial', 'Trial'
-    PROJECT = 'project', 'Project'
-    GERMPLASM = 'germplasm', 'Germplasm'
-    
-class PlotType(models.TextChoices):
-    """
-    Enumerate all plot types
-    """
-
-    MAIN_PLOT = 'main plot', 'Main Plot'
-    SPLIT_PLOT = 'split plot', 'Split Plot'
-    SPLIT_SPLIT_PLOT = 'split split plot', 'Split Split Plot'
-    SPLIT_SPLIT_SPLIT_PLOT = 'split split split plot', 'Split Split Split Plot'
-
-    @classmethod
-    def choices(cls):
-        return [(key.value, key.name.capitalize()) for key in cls]
-    
-class TreatmentType(models.TextChoices):
-    """
-    Enumerate all of the treatment group types
-    """
-
-    GERMPLASM = 'germplasm', 'Germplasm'        # planting different germplasm
-    PLANTING = 'planting', 'Planting'           # row spacing, seeding rates, etc.
-    FERTILIZER = 'fertilizer', 'Fertilizer'     # different fertilizers, rates, etc.
-    OPERATIONS = 'operations', 'Operations'     # Harvest schedules, residue treatments, etc.
-    HERBICIDE = 'herbicide', 'Herbicide'        # different herbicides, rates, etc.
-    OTHER = 'other', 'Other'                    # Everything else.
-
-class LocationType(models.TextChoices):
-    """
-    Enumeration for all location types
-    """
-    
-    PLOT = 'plot', 'Plot'
-    TRIAL = 'trial', 'Trial'
-    GENERAL = 'general', 'General'
-
-class GermplasmType(models.TextChoices):
-    """
-    Enumerate all of the germplasm types
-    """
-
-    PGC = 'pgc', 'PGC'
-    CROP = 'crop', 'Crop'
-
-""" Metadata Models"""
-class AttributeType(models.Model):
-    """
-    REVAMP THIS MODEL AND REVISIT LATER
-    Miscellaneous attribute model
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='attr_')
-    label = models.CharField(null=False, blank=False)
-    abbreviation = models.CharField(null=False, blank=False)
-    description = models.TextField(null=False, blank=False)
-    domain = models.CharField(
-        max_length=50,
-        choices = AttributeDomainType,
-        blank=False,
-        null=False
-    )
-
-    def __str__(self):
-        return f"{self.label} - {self.domain}"
-
-class Location(models.Model):
-    """
-    Location model for plots, trial, and general locations
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='loc_')
-    name = models.CharField(max_length=255, unique=True)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    type = models.CharField(null=False, choices=LocationType)
-
-    def get_absolute_url(self):
-        return reverse(
-            'data_storage:show_location',
-            args=[self.db_id]
-        )
-
-    def __str__(self):
-        return f"{self.name} - {self.latitude, self.longitude}"
-
-class State(models.Model):
-    """
-    State model to be populated with all 50 US states
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='state_')
-    name = models.CharField(max_length=255, null=False, unique=True)
-    abbreviation = models.CharField(max_length=255, null=False, unique=True)
-
-    def __str__(self):
-        return f"{self.name}, {self.abbreviation}"
-
-class Address(models.Model):
-    """
-    Address to handle address objects for organizations
-    FK on State
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='addr_')
-    name = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    address_line_1 = models.CharField(max_length=255, blank=False, null=False)
-    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
-    building_name = models.CharField(max_length=50, blank=True, null=True)
-    building_suite_number = models.CharField(max_length=50, blank=True, null=True)  # Optional field for building or suite number
-    city = models.CharField(max_length=100)
-    state_id = models.ForeignKey(State, on_delete=models.CASCADE)
-    postal_code = models.CharField(
-        max_length=10,
-        validators=[
-            RegexValidator(
-                regex=r'^\d{5}(?:-\d{4})?$',
-                message="Enter a valid US postal code in the format XXXXX or XXXXX-XXXX."
-            ),
-        ]
-    )
-
-    def __str__(self):
-        return f"{self.address_line_1}, {self.city}, {self.state_id.name} {self.postal_code}"
-
-class Organization(models.Model):
-    """
-    Organization model for different research institutions, companies, and groups
-    FK on Address
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='org_')
-    name = models.CharField(blank=False, null=False, unique=True)
-    abbreviation = models.CharField(blank=False, null=False, unique=True)
-    address_id = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=False)
-    ror_id = models.CharField(
-        max_length=30,
-        validators=[
-            RegexValidator(
-                regex=r'^https://ror\.org/[a-zA-Z0-9]{9}$',
-                message="Enter a valid ROR ID in the format https://ror.org/XXXXXXXXX."
-            ),
-        ],
-        unique=True
-    )
-
-    def __str__(self):
-        return self.name
-    
-class Person(models.Model):
-    """
-    Person model
-    FK on Organization
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='person_')
-    first_name = models.CharField(max_length=255, blank=False, null=False)
-    last_name = models.CharField(max_length=255, blank=False, null=False)
-    middle_initial = models.CharField(max_length=1)
-    affiliation_id = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    orcid = models.CharField(max_length=19, blank=True, null=True)
-    email = models.EmailField(unique=True, blank=True, null=True)
-    phone_number = PhoneNumberField(blank=True, null=False)
-
-    def __str__(self):
-        return f"{self.last_name}, {self.first_name} - {self.affiliation_id}"
-
-""" Project Level Models"""
-class Project(models.Model):
-    """
-    Project model to handle trial groupings into a project
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='proj_')
-    name = models.CharField(unique=True, null=False)
-    description = models.TextField(blank=False, null=False)
-    funding = models.CharField(max_length=255)
-    website = models.URLField(blank=True)
-
-    def truncate_description(self):
-        """Return a truncated description for displaying in the admin page"""
-        if len(self.description) > 50:
-            return format_html('{}...', self.description[:50])
-        return self.description
-    
-    def __str__(self):
-        return self.name
-
+""" Trial Models """
 class Trial(models.Model):
     """
     Trial model to handle groupings of plots and phenotypes under one grouping
@@ -257,13 +36,13 @@ class Trial(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='trial_')
     name = models.CharField(unique=True, null=False)
     location_id = models.ForeignKey(
-        Location, 
+        'resources.Location', 
         on_delete=models.CASCADE, 
         limit_choices_to={'type': 'trial'}
     )
-    manager_id = models.ForeignKey(Person, blank=False, null=False, on_delete=models.CASCADE)
-    project_id = models.ForeignKey(Project, blank=False, null=False, on_delete=models.CASCADE)
-    affiliation_id = models.ForeignKey(Organization, blank=False, null=False, on_delete=models.CASCADE)
+    manager_id = models.ForeignKey('resources.Person', blank=False, null=False, on_delete=models.CASCADE)
+    project_id = models.ForeignKey('resources.Project', blank=False, null=False, on_delete=models.CASCADE)
+    affiliation_id = models.ForeignKey('resources.Organization', blank=False, null=False, on_delete=models.CASCADE)
     establishment_year = models.CharField(max_length=4, choices=YEAR_CHOICES, default=date.today().year)
     multi_year = models.BooleanField(default=False, blank=False, null=False)
 
@@ -315,6 +94,21 @@ class TrialAttribute(models.Model):
     def __str__(self):
         return f"{self.key}: {self.value}"
 
+class TrialEvent(models.Model):
+    """
+    Trial Event model, tracks trial level agronomic processes and dates
+    FK1 on Trial
+    FK2 on AgroProcess
+    """
+    db_id = KsuidField(primary_key=True, editable=False, prefix='trialEvent_')
+    trial_id = models.ForeignKey(Trial, on_delete=models.CASCADE, blank=False, null=False)
+    process_id = models.ForeignKey('ontology.AgroProcess', on_delete=models.CASCADE, blank=False, null=False)
+    date = models.DateField(blank=False, null=False)
+    comment = models.TextField(max_length=500, blank=False, null=False)
+
+    def __str__(self):
+        return f"{self.trial_id.name} - {self.process_id.label}"
+    
 """ Treatment Models """
 class Treatment(models.Model):
     """
@@ -370,7 +164,7 @@ class TrialTreatment(models.Model):
     def __str__(self):
         return f"{self.trial_id}: {self.treatment_id.name}"
 
-""" Germplasm """
+""" Germplasm Models """
 class CommonName(models.Model):
     """
     Common name model to hold the common name of a crop.
@@ -413,7 +207,7 @@ class GermplasmAlias(models.Model):
     def __str__(self):
         return f"{self.alias} -> {self.germplasm_id.name}"
 
-""" Plots """
+""" Plot Models """
 class Plot(models.Model):
     """
     Plot model to handle plot objects in a trial
@@ -452,7 +246,7 @@ class Plot(models.Model):
         related_name='children'
     )
     location_id = models.ForeignKey(
-        Location, 
+        'resources.Location', 
         on_delete=models.CASCADE, 
         limit_choices_to={'type': 'plot'},
         null=True,
@@ -502,118 +296,7 @@ class PlotTreatment(models.Model):
     def __str__(self):
         return f"{self.plot_crop_id.plot_id.label} - {self.plot_crop_id.plot_year}: {self.treatment_level_id.level}"
 
-""" Ontological Terms """
-class TraitEntity(models.Model):
-    """
-    Entity model holds the label information about a specific trait entity object
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='traitEntity_')
-    label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    external_ontology_reference = models.URLField(null=True, blank=True)
-    
-    def __str__(self):
-        return self.label
-
-class TraitAttribute(models.Model):
-    """
-    Attribute model holds the label information about a specific trait attribute object
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='traitAttr_')
-    label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    external_ontology_reference = models.URLField(null=True, blank=True)
-    
-    def __str__(self):
-        return self.label
-
-class VarTrait(models.Model):
-    """
-    Trait model holds the specific trait identity for a given variable.
-    FK on TraitEntity
-    FK on TraitAttrribute
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='varTrait_')
-    label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    entity_id = models.ForeignKey(TraitEntity, on_delete=models.CASCADE, blank=False, null=False)
-    attribute_id = models.ForeignKey(TraitAttribute, on_delete=models.CASCADE, blank=False, null=False)
-    external_ontology_reference = models.URLField(null=True, blank=True)
-    
-    def __str__(self):
-        return self.label
-
-class VarMethod(models.Model):
-    """
-    Method model holds variable method label and descriptions
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='varMethod_')
-    label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    description = models.TextField(max_length=500)
-    external_ontology_reference = models.URLField(null=True, blank=True)
-    
-    def __str__(self):
-        return self.label
-
-class VarScale(models.Model):
-    """
-    Scale model holds variable scale label and descriptions
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='varScale_')
-    label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    description = models.TextField(max_length=500)
-    external_ontology_reference = models.URLField(null=True, blank=True)
-    
-    def __str__(self):
-        return self.label
-
-class Variable(models.Model):
-    """
-    Variable model for the ontology
-    FK1 on VarTrait
-    Fk2 on VarMethod
-    FK3 on VarScale
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='variable_')
-    label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    abbreviation = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    trait_id = models.ForeignKey(VarTrait, on_delete=models.CASCADE, blank=False, null=False)
-    method_id = models.ForeignKey(VarMethod, on_delete=models.CASCADE, blank=False, null=False)
-    scale_id = models.ForeignKey(VarScale, on_delete=models.CASCADE, blank=False, null=False)
-    sop_url = models.URLField(blank=True, null=True)
-    min_value = models.FloatField(blank=True, null=True)
-    max_value = models.FloatField(blank=True, null=True)
-    type = models.CharField(max_length=50, choices=VariableType, blank=False, null=False)
-    
-    def __str__(self):
-        return f"{self.label} - ({self.abbreviation})"
-
-class AgroProcess(models.Model):
-    """
-    Agronomic process model
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='agroProcess_')
-    label = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    description = models.TextField(max_length=500, null=False, blank=False)
-    external_id = models.CharField(max_length=255, null=False, blank=False)
-    external_reference = models.URLField()
-
-    def __str__(self):
-        return self.label
-    
-class TrialEvent(models.Model):
-    """
-    Trial Event model, tracks trial level agronomic processes and dates
-    FK1 on Trial
-    FK2 on AgroProcess
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='trialEvent_')
-    trial_id = models.ForeignKey(Trial, on_delete=models.CASCADE, blank=False, null=False)
-    process_id = models.ForeignKey(AgroProcess, on_delete=models.CASCADE, blank=False, null=False)
-    date = models.DateField(blank=False, null=False)
-    comment = models.TextField(max_length=500, blank=False, null=False)
-
-    def __str__(self):
-        return f"{self.trial_id.name} - {self.process_id.label}"
-
-""" Observation Tables """
+""" Observation Models """
 class Observation(models.Model):
     """
     Observation model to connect observations with Person(s) PlotCrop records, and variables
@@ -623,9 +306,9 @@ class Observation(models.Model):
     """
     db_id = KsuidField(primary_key=True, editable=False, prefix='observation_')
     date_time = models.DateTimeField(blank=False, null=False)
-    observer_id = models.ForeignKey(Person, on_delete=models.CASCADE, blank=False, null=False)
+    observer_id = models.ForeignKey('resources.Person', on_delete=models.CASCADE, blank=False, null=False)
     plot_crop_id = models.ForeignKey(PlotCrop, on_delete=models.CASCADE, blank=False, null=False)
-    variable_id = models.ForeignKey(Variable, to_field='label', on_delete=models.CASCADE)
+    variable_id = models.ForeignKey('ontology.Variable', to_field='label', on_delete=models.CASCADE)
     value = models.CharField(max_length=255, null=False)
 
     def clean(self):
@@ -647,70 +330,3 @@ class Observation(models.Model):
     def __str__(self):
         return f"{self.plotId} - {self.variable}: {self.value}"
 
-""" AWS Models """
-class AwsModel(models.Model):
-    """
-    AWS Model structure to record all different AWS models in the system
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='awsModel_')
-    name = models.CharField(max_length=255, null=False, blank=False)
-    version = models.CharField(max_length=255, null=False, blank=False)
-    description = models.TextField(max_length=500, blank=False, null=False)
-    endpoint_url = models.URLField(null=False, blank=False)
-
-    def __str__(self):
-        return f"{self.name} - {self.version}"
-
-""" Image and File Storage """
-class Image(models.Model):
-    """
-    Image model for determining the structure of images connected to a specific observation
-    FK on Observation
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='image_')
-    filename = models.CharField(
-        max_length=255, 
-        blank=False, 
-        null=False, 
-        validators=[
-            validate_image_file_extension
-        ]
-    )
-    height = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(99999)
-        ]
-    )
-    width = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(99999)
-        ]
-    )
-    creation_date_time = models.DateTimeField(blank=False, null=False)
-    storage_url = models.URLField(blank=False, null=False)
-    observation_id = models.ForeignKey(Observation, on_delete=models.SET_NULL, null=True, blank=False)
-
-    def __str__(self):
-        if self.observation_id:
-            observation = self.observation_id
-            return f"{self.filename} - {self.creation_date_time} - {self.observation_id.variable_id.label}"
-        else:
-            return f"{self.filename} - {self.creation_date_time} - No observations linked"
-
-class ImageOperation(models.Model):
-    """
-    Image Operation model outlines the structure of individual operations performed on an image by a model
-    FK1 on Image
-    FK2 on AwsModel
-    """
-    db_id = KsuidField(primary_key=True, editable=False, prefix='imageOperation_')
-    image_id = models.ForeignKey(Image, on_delete=models.CASCADE, blank=False, null=False)
-    model_id = models.ForeignKey(AwsModel, on_delete=models.CASCADE, blank=False, null=False)
-    date_time = models.DateTimeField(auto_now_add=True, blank=False, null=False)
-    status = models.CharField(max_length=50, choices=StatusType)
-
-    def __str__(self):
-        return f"{self.image_id} - {self.model_id} - {self.date_time}: {self.status}"
- 
