@@ -4,13 +4,27 @@ Initial PostgreSQL DB Population
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.contrib.auth.models import User
+
+# Resource models
 from resources.models import Attribute, Location, State, Address, Organization, Person, Project
+
+# Data Storage models
 from data_storage.models import Trial, TrialYear, TrialAttribute, TrialEvent
 from data_storage.models import Treatment, TreatmentLevel, TrialTreatment
+from data_storage.models import CommonName, Germplasm, GermplasmAlias
 from data_storage.models import Plot, PlotCrop, PlotTreatment, PlotType
+
+# Ontology models
+from ontology.models import TraitEntity, TraitAttribute, VarTrait, VarScale, VarMethod, Variable, SopDocument, AgroProcess
+
+# Imaging Models
+from imaging.models import Image, ImageOperation, AwsModel
+
+
 from faker import Faker
 import random
 import pandas as pd
+import polars as pl
 
 faker = Faker()
 
@@ -82,6 +96,24 @@ class Command(BaseCommand):
                 postal_code = "50011"
             )
 
+            # UNL
+            Address.objects.create(
+                name = "University of Nebraska - Lincoln",
+                address_line_1 = "1400 R St.",
+                city = "Lincoln",
+                state_id = State.objects.get(abbreviation="NE"),
+                postal_code = "68588"
+            )
+
+            # UWM
+            Address.objects.create(
+                name = "University of Wisconsin - Madison",
+                address_line_1 = "500 Lincoln Dr.",
+                city = "Madison",
+                state_id = State.objects.get(abbreviation="WI"),
+                postal_code = "53706"
+            )
+
         # Populate organizations
         if not Organization.objects.exists():
             # Corteva
@@ -89,7 +121,8 @@ class Command(BaseCommand):
                 name='Corteva Agriscience',
                 abbreviation='CTV',
                 address_id=Address.objects.get(name="Corteva - Johnston"),
-                ror_id='https://ror.org/02pm1jf23'
+                ror_id='https://ror.org/02pm1jf23',
+                logo_url='assets/corteva_agriscience.png'
             )
 
             # TLI
@@ -97,15 +130,35 @@ class Command(BaseCommand):
                 name='The Land Institute',
                 abbreviation='TLI',
                 address_id=Address.objects.get(name="The Land Institute - Salina"),
-                ror_id='https://ror.org/00jxaym78'
+                ror_id='https://ror.org/00jxaym78',
+                logo_url='assets/the_land_institute.png'
             )
 
             # ISU-abe
             Organization.objects.create(
-                name='Iowa State University - Agricultural and Biological Engineering',
-                abbreviation='ISU-ABE',
+                name='Iowa State University',
+                abbreviation='ISU',
                 address_id=Address.objects.get(name="Iowa State University ABE - Ames"),
-                ror_id='https://ror.org/04rswrd78'
+                ror_id='https://ror.org/04rswrd78',
+                logo_url='assets/iowa_state_university.png'
+            )
+
+            # UNL
+            Organization.objects.create(
+                name='University of Nebraska - Lincoln',
+                abbreviation='UNL',
+                address_id=Address.objects.get(name="University of Nebraska - Lincoln"),
+                ror_id='https://ror.org/043mer456',
+                logo_url='assets/university_of_nebraska_lincoln.jpg'
+            )
+
+            # UWM
+            Organization.objects.create(
+                name='University of Wisconsin - Madison',
+                abbreviation='UWM',
+                address_id=Address.objects.get(name="University of Wisconsin - Madison"),
+                ror_id='https://ror.org/01y2jtd41',
+                logo_url='assets/university_of_wisconsin.jpg'
             )
             
         # Populate Persons
@@ -176,7 +229,17 @@ class Command(BaseCommand):
                 multi_year = True
             )
 
-        
+        # Populate Trial years
+        if not TrialYear.objects.all():
+            fab_trial = Trial.objects.get(name='FABPGC_TLI_keystone')
+            years = [2024, 2025, 2026, 2027]
+            for year in years:
+                trial_year = TrialYear(
+                    trial_id=fab_trial, 
+                    year=year)
+                trial_year.full_clean()
+                trial_year.save()
+
         # Populate Treatment Groups
         if not Treatment.objects.exists():
             Treatment.objects.create(
@@ -264,6 +327,28 @@ class Command(BaseCommand):
                     width_m=row.width_m,
                     length_m=row.length_m,
                     parent_plot_id=parent_plot
+                )
+        
+        # Populate SOP Table
+        if not SopDocument.objects.exists():
+            sop_df = pl.read_csv('data_storage/sop_documents.csv')
+            for i in range(len(sop_df.rows())):
+                SopDocument.objects.create(
+                    document_name = sop_df[i]['document_name'].item(),
+                    label = sop_df[i]['label'].item(),
+                    version = sop_df[i]['version'].item(),
+                    doi = sop_df[i]['doi'].item(),
+                    doc_url = sop_df[i]['doc_url'].item(),
+                    description = sop_df[i]['description'].item()
+                )
+
+        # Populate CommonName
+        if not CommonName.objects.exists():
+            names = ['Corn', 'Soybean', 'Kentucky Bluegrass', 'Poa bulbosa', 'Kura clover']
+            
+            for name in names:
+                CommonName.objects.create(
+                    name=name
                 )
 
         self.stdout.write(self.style.SUCCESS('Successfully populated initial data'))

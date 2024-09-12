@@ -7,7 +7,7 @@ from .models import CommonName, Germplasm, GermplasmAlias
 from .models import Plot, PlotCrop, PlotTreatment
 from .models import Observation
 
-from config.filters import ManagerFilter
+from config.filters import ManagerFilter, TrialYearFilter, PlotCropFilter
 
 """ Trial Models """
 @admin.register(Trial)
@@ -15,7 +15,14 @@ class TrialAdmin(admin.ModelAdmin):
     list_display = ['name', 'project_id', 'affiliation_id', 'manager_id', 'establishment_year', 'multi_year']
     list_filter = ['establishment_year', 'multi_year', 'affiliation_id', 'project_id', ManagerFilter]
 
-admin.site.register(TrialYear)
+@admin.register(TrialYear)
+class TrialYearAdmin(admin.ModelAdmin):
+    list_display = ['trial_id', 'year']
+    list_filter = ['trial_id', TrialYearFilter]
+    ordering = ['trial_id', 'year']
+    search_fields = ['trial_id', 'year']
+    show_facets = admin.ShowFacets.ALWAYS
+
 admin.site.register(TrialAttribute)
 admin.site.register(TrialEvent)
 
@@ -55,7 +62,7 @@ class PlotAdmin(admin.ModelAdmin):
 @admin.register(PlotCrop)
 class PlotCropAdmin(admin.ModelAdmin):
     list_display = ['plot_id', 'plot_year', 'germplasm_id']
-    list_filter = ['plot_year', 'germplasm_id']
+    list_filter = ['germplasm_id', PlotCropFilter]
     search_fields = ['plot_year', 'plot_id', 'germplasm_id']
     ordering = ['plot_year', 'plot_id']
 

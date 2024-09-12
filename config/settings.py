@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     # 'django.contrib.gis',
+    'fontawesomefree',
     'ontology.apps.OntologyConfig',
     'data_storage.apps.DataStorageConfig',
     'imaging.apps.ImagingConfig',

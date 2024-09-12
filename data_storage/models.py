@@ -20,7 +20,7 @@ from django.utils.html import format_html
 from phonenumber_field.modelfields import PhoneNumberField
 
 # App imports
-from config.enumerations import AttributeDomainType, PlotType, TreatmentType, LocationType, GermplasmType
+from config.enumerations import AttributeDomainType, PlotType, TreatmentType, LocationType, GermplasmType, YearEnum
 from config.custom_fields import KsuidField
 
 """ Trial Models """
@@ -31,7 +31,6 @@ class Trial(models.Model):
     FK2 on Person
     FK3 on Organization
     """
-    YEAR_CHOICES = [(r, str(r)) for r in range(1970, date.today().year + 1)]
     
     db_id = KsuidField(primary_key=True, editable=False, prefix='trial_')
     name = models.CharField(unique=True, null=False)
@@ -43,7 +42,7 @@ class Trial(models.Model):
     manager_id = models.ForeignKey('resources.Person', blank=False, null=False, on_delete=models.CASCADE)
     project_id = models.ForeignKey('resources.Project', blank=False, null=False, on_delete=models.CASCADE)
     affiliation_id = models.ForeignKey('resources.Organization', blank=False, null=False, on_delete=models.CASCADE)
-    establishment_year = models.CharField(max_length=4, choices=YEAR_CHOICES, default=date.today().year)
+    establishment_year = models.IntegerField(choices=YearEnum.choices, default=date.today().year)
     multi_year = models.BooleanField(default=False, blank=False, null=False)
 
     def __str__(self):
@@ -55,11 +54,10 @@ class TrialYear(models.Model):
     FK on Trial
     Year limited to years that are greater than or equal to the trial establishment year
     """
-    YEAR_CHOICES = [(r, str(r)) for r in range(1900, date.today().year + 1)]
 
     db_id = KsuidField(primary_key=True, editable=False, prefix='trialYear_')
     trial_id = models.ForeignKey(Trial, on_delete=models.CASCADE, blank=False, null=False)
-    year = models.IntegerField(choices=YEAR_CHOICES, default=date.today().year)
+    year = models.IntegerField(choices=YearEnum.choices, default=date.today().year)
 
     def clean(self):
         super().clean()
@@ -268,12 +266,21 @@ class PlotCrop(models.Model):
     FK2 on Germplasm
     Composite key unique constraint on plot_id, germplasm_id, and year
     """
-    YEAR_CHOICES = [(r, str(r)) for r in range(1900, date.today().year + 1)]
 
     db_id = KsuidField(primary_key=True, editable=False, prefix='plotCrop_')
     plot_id = models.ForeignKey(Plot, on_delete=models.CASCADE, blank=False, null=False)
     germplasm_id = models.ForeignKey(Germplasm, on_delete=models.CASCADE, blank=False, null=False)
-    plot_year = models.CharField(max_length=4, choices=YEAR_CHOICES, default=date.today().year)
+    plot_year = models.IntegerField(choices=YearEnum.choices, default=date.today().year)
+
+    def clean(self):
+        super().clean()
+
+        trial = self.plot_id.trial_id
+
+        if int(self.plot_year) < int(trial.establishment_year):
+            raise ValidationError(
+                {'plot_year': _(f"The plot crop year cannot be earlier than the trial establishment year ({trial.establishment_year}).")}
+            )
 
     class Meta:
         constraints = [

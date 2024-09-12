@@ -3,6 +3,7 @@ Data Ontology Models
 """
 
 from django.db import models
+from django.utils.html import format_html
 
 # App imports
 from config.enumerations import VariableType
@@ -101,9 +102,20 @@ class SopDocument(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='sop_')
     document_name = models.CharField(max_length=255, blank=False, null=False)
     label = models.CharField(max_length=255, blank=False, null=True)
-    doi = models.CharField(max_length=255, blank=False)
-    url = models.URLField(blank=False, null=True)
+    version = models.CharField(max_length=8, blank=False, null=False)
+    doi = models.URLField(blank=False, null=False)
+    doc_url = models.URLField(blank=False, null=False)
+    description = models.TextField(max_length=500, blank=False)
     variable_id = models.ForeignKey(Variable, on_delete=models.CASCADE, blank=True, null=True, related_name='sop_documents')
+
+    class Meta:
+        ordering = ['label']
+
+    def truncate_description(self):
+        """Return a truncated description for displaying in the tables"""
+        if len(self.description) > 100:
+            return format_html('{}...', self.description[:100])
+        return self.description
 
     def __str__(self):
         return self.label

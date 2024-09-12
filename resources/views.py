@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core.mail import send_mail
 
+from resources.models import Organization
 from .forms import ContactForm
 
 
@@ -15,11 +16,12 @@ def resource_index(request):
     )
 
 def list_organizations(request):
+    organizations = Organization.objects.all()
 
     return render(
         request, 
         'resources/organizations.html',
-        {}
+        {'orgs': organizations}
     )
 
 def manage_projects(request):

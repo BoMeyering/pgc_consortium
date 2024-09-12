@@ -5,6 +5,8 @@ Enumerations and FieldTypes
 from django.db import models
 from ksuid import Ksuid
 from functools import partial
+from datetime import date, datetime
+from enum import IntEnum, Enum
 
 """ Enumerations """    
 class VariableType(models.TextChoices):
@@ -68,3 +70,13 @@ class GermplasmType(models.TextChoices):
     """
     PGC = 'pgc', 'PGC'
     CROP = 'crop', 'Crop'
+
+class YearEnum(Enum):
+    """
+    Enumerate all the year choices
+    """
+    @classmethod
+    def choices(cls):
+        current_year = date.today().year
+        print(datetime.now())
+        return [(year, str(year)) for year in range(1970, current_year + 20)]

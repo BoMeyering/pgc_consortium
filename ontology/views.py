@@ -1,7 +1,12 @@
+"""
+Ontology Views
+"""
+
 from django.shortcuts import render
 from .models import Variable
 from data_storage.models import CommonName
 
+from ontology.models import SopDocument
 
 # Create your views here.
 def list_variables(request):
@@ -62,9 +67,11 @@ def import_ontology(request):
 
 def list_sop(request):
 
+    sops = SopDocument.objects.all()
+
     return render(
         request, 
         'ontology/sop.html',
-        {}
+        {'sops': sops}
     )
 

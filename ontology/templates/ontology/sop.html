@@ -20,49 +20,37 @@
     <h2>
         SOP description and download
     </h2>
-    <table class="table table-dark">
-        <tr>
-            <th>SOP Name</th>
-            <th>Version</th>
-            <th>Description</th>
-        </tr>
-        <tr>
-            <td>
-                <a class="link-light" href="https://zenodo.org/records/10520249/files/TLI_PLP_10041247_sainfoin_cloning.pdf?download=1" download>
-                    Maize plant height
-                </a>
-            </td>
-            <td>1.1</td>
-            <td>Measuring the height of a corn plant in cm.</td>
-        </tr>
-        <tr>
-            <td>
-                <a class="link-light" href="https://zenodo.org/records/10009905/files/TLI_PLP_8412413_sop_creation_policies.pdf?download=1" download>
-                    PGC plot image acquisition
-                </a>
-            </td>
-            <td>1.3</td>
-            <td>How to take great PGC plot images for coverage predictions</td>
-        </tr>
-        <tr>
-            <td>
-                <a class="link-light" href="https://zenodo.org/records/10520249/files/TLI_PLP_10041247_sainfoin_cloning.pdf?download=1" download>
-                    LI-COR gas collar installation
-                </a>
-            </td>
-            <td>0.2</td>
-            <td>Gas collar installation methodologies</td>
-        </tr>
-        <tr>
-            <td>
-                <a class="link-light" href="https://zenodo.org/records/10009905/files/TLI_PLP_8412413_sop_creation_policies.pdf?download=1" download>
-                    PGC aboveground biomass measurement
-                </a>
-            </td>
-            <td>1.3</td>
-            <td>Estimating the aboveground PGC biomass from an ROI</td>
-        </tr>
-
+    <table class="table table-hover" id="table-theme">
+        <thead>
+            <tr>
+                <th>SOP Name</th>
+                <th>Document DOI</th>
+                <th>Version</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sop in sops %}
+            <tr draggable="true">
+                <td>
+                    <a class="row-link" href="{{ sop.doc_url }}" download>
+                        {{ sop.label }}
+                    </a>
+                </td>
+                <td>
+                    <a class="row-link" href="{{ sop.doi }}" target="_blank" download>
+                        {{ sop.doi }}
+                    </a>
+                </td>
+                <td>
+                    {{ sop.version }}
+                </td>
+                <td>
+                    {{ sop.truncate_description }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
     </table>
 </div>
 {% endblock %}
