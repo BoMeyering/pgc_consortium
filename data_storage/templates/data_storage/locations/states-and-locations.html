@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}States and Locations{% endblock %}
+
+{% block content %}
+<h1>Locations</h1>
+<ol>
+    {% for state in states %}
+        <li>
+            <a class="nav-link active" href="{% url 'data_storage:show_state' state.abbreviation %}">
+                {{state.name}} ({{state.abbreviation}})
+            </a>
+        </li>
+    {% endfor %}
+</ol>
+<p>
+    Now lets grab all the locations 
+</p>
+<table class=" table table-dark">
+    <tr>
+        <th>Location Name</th>
+        <th>Type</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+    </tr>
+    {% for location in locations %}
+        <tr>
+            <td>
+                <a class="link-light" href="{{ location.get_absolute_url }}">
+                    {{ location.name }}
+                </a>
+            </td>
+            <td>{{ location.type }}</td>
+            <td>{{ location.latitude }}</td>
+            <td>{{ location.longitude }}</td>
+        </tr>    
+    {% endfor %}
+</table>
+<p>
+    Now that's what I call a table!
+</p>
+<div class="row">
+    <div class="col-md-6">
+        <a href="{% url 'data_storage:paginate_locations' %}">Check out our paginator</a>
+    </div>
+</div>
+
+{% endblock %}

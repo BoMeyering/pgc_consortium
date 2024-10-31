@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}List SOPs{% endblock %}
+
+{% block content %}
+<h1>Upload Ontology</h1>
+    <div class="container-fluid">
+        <form action="/upload-ontology/" method="post" enctype="multipart/form-data">
+            <!-- CSRF Token (required if using Django's CSRF protection) -->
+            <!-- <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"> -->
+    
+            <!-- Ontology Name Field -->
+            <div>
+                <label for="ontology_name">Ontology Name:</label>
+                <input type="text" id="ontology_name" name="ontology_name" required>
+            </div>
+    
+            <!-- JSON File Upload Field -->
+            <div>
+                <label for="json_file">Upload JSON File:</label>
+                <input type="file" id="json_file" name="json_file" accept=".json">
+            </div>
+    
+            <!-- OR JSON Text Area -->
+            <div>
+                <label for="json_text">Or Paste JSON Text:</label>
+                <textarea id="json_text" name="json_text" rows="10" cols="50"></textarea>
+            </div>
+    
+            <!-- Submit Button -->
+            <div>
+                <button type="submit">Upload</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

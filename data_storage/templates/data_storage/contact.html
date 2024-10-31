@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if sent %}
+        <h1>Email successfully sent</h1>
+        <p>
+            An email with the subject "{{ form.cleaned_data.subject }}" was sent to {{ form.cleaned_data.to }}.
+        </p>
+    {% else %}
+        <h1>Having an issue? Contact our developer team</h1>
+        <form method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <input type="submit" value="Send email">
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
