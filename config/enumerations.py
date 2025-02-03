@@ -19,6 +19,18 @@ class VariableType(models.TextChoices):
     PGC_CLOVER = 'pgc clover', 'PGC Clover'
     WEED = 'weed', 'Weed'
     SOIL = 'soil', 'Soil'
+
+class ScaleType(models.TextChoices):
+    """
+    Enumerate all of the different types of scales for variables
+    """
+    DATE = 'date', 'Date'
+    DURATION = 'duration', 'Duration'
+    NOMINAL = 'nominal', 'Nominal'
+    NUMERICAL = 'numerical', 'Numerical'
+    ORDINAL = 'ordinal', 'Ordinal'
+    COUNT = 'count', 'Count'
+
     
 class StatusType(models.TextChoices):
     """
@@ -78,5 +90,4 @@ class YearEnum(Enum):
     @classmethod
     def choices(cls):
         current_year = date.today().year
-        print(datetime.now())
         return [(year, str(year)) for year in range(1970, current_year + 20)]

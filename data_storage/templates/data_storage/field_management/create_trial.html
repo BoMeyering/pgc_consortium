@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Trial{% endblock %}
+
+{% block content %}
+HELLO
+{% if project %}
+    <h1>
+        {{ project }}
+    </h1>
+{% else %}
+    <h1>
+        No Project is associated
+    </h1>
+{% endif %}
+<div class="container justify-content-center">
+    {% if project %}
+        <h1>
+            Create a new trial in {{ project.name }}
+        </h1>
+    {% else %}
+        <h1>
+            Create a new trial
+        </h1>
+    {% endif %}
+    <form class="row g-4" method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <!-- <div class="col-md-6 mb-3"> 
+            {{ form.name.errors }}
+            <label for="project_name" class="form-label">
+                {{ form.name.label }}
+            </label>
+            {{ form.name }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.funding.errors }}
+            <label for="project_funding" class="form-label">
+                {{ form.funding.label }}
+            </label>
+            {{ form.funding }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.website.errors }}
+            <label for="project_website" class="form-label">
+                {{ form.website.label }}
+            </label>
+            {{ form.website }}
+        </div>
+        <div class="col-md-12 mb-3">
+            {{ form.description.errors }}
+            <label for="project_funding" class="form-label">
+                {{ form.description.label }}
+            </label>
+            {{ form.description }}
+        </div> -->
+        <div class="col-md-3 mb-3">
+            <button type="submit" class="btn btn-secondary">Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

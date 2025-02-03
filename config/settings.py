@@ -26,7 +26,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-wkc^zm+aaw)j4@rrw!s1yq7$#uoo9y$4j*5ge=ifz#02m%zj_p'
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -45,14 +44,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_spectacular',
     # 'django.contrib.gis',
     'fontawesomefree',
     'ontology.apps.OntologyConfig',
     'data_storage.apps.DataStorageConfig',
     'imaging.apps.ImagingConfig',
     'api.apps.ApiConfig',
-    'resources.apps.ResourcesConfig'
-
+    'resources.apps.ResourcesConfig',
+    'blog.apps.BlogConfig'
 ]
 
 MIDDLEWARE = [
@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'api.responses.StandardizedResponse',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -85,6 +86,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# DRF Pagination Config
+# REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+#     'PAGE_SIZE': 5,
+# }
+
+# DRF Settings
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'api.renderers.StandardizedJSONRenderer',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+}
+
+# drf-spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'My API',
+    'DESCRIPTION': 'A description of my API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,  # Optional, if you want to serve the schema at a URL
+    'COMPONENT_SPLIT_REQUEST': True,  # Optional, if you want to split request and response schema
+    'OPENAPI_VERSION': '3.1.0'
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

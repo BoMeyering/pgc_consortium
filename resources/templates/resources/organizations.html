@@ -31,7 +31,7 @@
                         <img src="{% static org.logo_url %}" class="card-img-top img-responsive align-self-center" alt="{{ org.name }}">
                         <div class="overlay">
                             <h2>{{ org.name }}</h2>
-                            <a class="info" href="#">
+                            <a class="info" href="{% url 'resources:organization_detail' org.slug %}">
                                 Click here
                             </a>
                         </div>

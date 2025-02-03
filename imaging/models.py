@@ -51,7 +51,7 @@ class Image(models.Model):
     )
     creation_date_time = models.DateTimeField(blank=False, null=False)
     storage_url = models.URLField(blank=False, null=False)
-    observation_id = models.ForeignKey('data_storage.Observation', on_delete=models.SET_NULL, null=True, blank=False)
+    observation_id = models.ForeignKey('data_storage.CropObservation', on_delete=models.SET_NULL, null=True, blank=False)
 
     def __str__(self):
         if self.observation_id:

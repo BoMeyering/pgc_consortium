@@ -12,11 +12,35 @@
     <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <!-- Plugin for color scale -->
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <!-- Tooltip style -->
+    <style>
+        .tooltip {
+            background-color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 15px;
+            min-width: 400px;
+            text-align: left;
+            color: white;
+        }
+
+        .xAxis line {
+            stroke: #B8B8B8;
+        }
+    </style>
+    <script>
+        /*to prevent Firefox FOUC, this must be here*/
+        let FF_FOUC_FIX;
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">PGC Consortium</a>
+            <a class="navbar-brand" href="/"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -96,6 +120,12 @@
                                     </svg> -->
                                     <i class="fa-solid fa-map-location-dot"></i>
                                     Maps
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'data_storage:logbook' %}">
+                                    <i class="fa-solid fa-tractor"></i>
+                                    Field Trial Logbook
                                 </a>
                             </li>
                         </ul>
@@ -204,7 +234,11 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'resources:resource_index' %}">
+                                <!-- <a class="dropdown-item" href="{% url 'resources:resource_index' %}">
+                                    <i class="fa-solid fa-code"></i>
+                                    API Reference
+                                </a> -->
+                                <a class="dropdown-item" href=localhost:8000/admin>
                                     <i class="fa-solid fa-code"></i>
                                     API Reference
                                 </a>
@@ -220,7 +254,7 @@
     </nav>
 
     <div class="d-flex">
-        <main class="flex-grow-1 p-3">
+        <main class="flex-grow-1 p-0">
             {% block content %}
             {% endblock %}
         </main>
@@ -255,7 +289,8 @@
                 </a>
             </li>
           </ul>
-          <p class="text-center navbar-dark navbar-brand">&copy; 2024 PGC Consortium</p>
+          <!-- <p class="text-center navbar-dark navbar-brand">&copy; 2024 PGC Consortium</p> -->
+          <p class="text-white text-center">&copy; 2024 PGC Consortium</p>
         </footer>
       </div>
 

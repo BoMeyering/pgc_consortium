@@ -105,6 +105,15 @@ class Command(BaseCommand):
                 postal_code = "68588"
             )
 
+            # Missou
+            Address.objects.create(
+                name = "University of Missouri",
+                address_line_1 = "230 Jesse Hall",
+                city = "Columbia",
+                state_id = State.objects.get(abbreviation="MO"),
+                postal_code = "65211"
+            )
+
             # UWM
             Address.objects.create(
                 name = "University of Wisconsin - Madison",
@@ -152,6 +161,15 @@ class Command(BaseCommand):
                 logo_url='assets/university_of_nebraska_lincoln.jpg'
             )
 
+            # Mizzou
+            Organization.objects.create(
+                name='University of Missouri',
+                abbreviation='MIZ',
+                address_id=Address.objects.get(name="University of Missouri"),
+                ror_id='https://ror.org/02ymw8z06',
+                logo_url='assets/mizzou.jpg'
+            )
+
             # UWM
             Organization.objects.create(
                 name='University of Wisconsin - Madison',
@@ -190,7 +208,7 @@ class Command(BaseCommand):
                 name = 'FAB PGC',
                 description = "A project that generates lots of data through keystone field experiments",
                 funding = "DOE 123456789",
-                website = ""
+                website = "https://somerandomurl.org"
             )
 
         # Populate Locations
@@ -208,34 +226,186 @@ class Command(BaseCommand):
             for _ in range(4):
                 org = Organization.objects.order_by('?').first()
                 Trial.objects.create(
-                    name = org.abbreviation + "_trial_" + str(faker.random_number()),
+                    name = org.abbreviation + " trial " + str(faker.random_number()),
                     location_id = Location.objects.filter(type='trial').order_by('?').first(),
                     manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
                     project_id = Project.objects.order_by('?').first(),
                     affiliation_id = org,
                     establishment_year = faker.year(),
-                    multi_year = bool(random.randint(0, 1))
+                    multi_year = bool(random.randint(0, 1)),
+                    experimental_unit_level = 'split plot'
                 )
             
+            # Create TLI Trials
             org = Organization.objects.get(name='The Land Institute')
             project = Project.objects.get(name='FAB PGC')
+
             Trial.objects.create(
-                name = 'FABPGC_TLI_keystone', 
+                name = 'FAB_TLI_keystone', 
                 location_id = Location.objects.filter(type='trial').order_by('?').first(),
                 manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
                 project_id = project,
                 affiliation_id = org,
                 establishment_year = 2024,
-                multi_year = True
+                multi_year = True,
+                experimental_unit_level = 'split split plot'
+            )
+
+            Trial.objects.create(
+                name = 'FAB_TLI_strip_plot', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'main plot'
+            )
+
+            # Create CTV Trials
+            org = Organization.objects.get(name='Corteva Agriscience')
+            project = Project.objects.get(name='FAB PGC')
+
+            Trial.objects.create(
+                name = 'FAB_CTV_keystone', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'split split plot'
+            )
+
+            Trial.objects.create(
+                name = 'FAB_CTV_strip_plot', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'main plot'
+            )
+
+            # Create ISU Trials
+            org = Organization.objects.get(name='Iowa State University')
+            project = Project.objects.get(name='FAB PGC')
+
+            Trial.objects.create(
+                name = 'FAB_ISU_keystone', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'split split plot'
+            )
+
+            Trial.objects.create(
+                name = 'FAB_ISU_strip_plot', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'main plot'
+            )
+
+            # Create UNL Trials
+            org = Organization.objects.get(name='University of Nebraska - Lincoln')
+            project = Project.objects.get(name='FAB PGC')
+
+            Trial.objects.create(
+                name = 'FAB_UNL_keystone', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'split split plot'
+            )
+
+            Trial.objects.create(
+                name = 'FAB_UNL_strip_plot', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'main plot'
+            )
+
+            # Create MIZ Trials
+            org = Organization.objects.get(name='University of Missouri')
+            project = Project.objects.get(name='FAB PGC')
+
+            Trial.objects.create(
+                name = 'FAB_MIZ_keystone', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'split split plot'
+            )
+
+            Trial.objects.create(
+                name = 'FAB_MIZ_strip_plot', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'main plot'
+            )
+
+            # Create UWM Trials
+            org = Organization.objects.get(name='University of Wisconsin - Madison')
+            project = Project.objects.get(name='FAB PGC')
+
+            Trial.objects.create(
+                name = 'FAB_UWM_keystone', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'split split plot'
+            )
+
+            Trial.objects.create(
+                name = 'FAB_UWM_strip_plot', 
+                location_id = Location.objects.filter(type='trial').order_by('?').first(),
+                manager_id = Person.objects.filter(affiliation_id=org).order_by('?').first(),
+                project_id = project,
+                affiliation_id = org,
+                establishment_year = 2024,
+                multi_year = True,
+                experimental_unit_level = 'main plot'
             )
 
         # Populate Trial years
         if not TrialYear.objects.all():
-            fab_trial = Trial.objects.get(name='FABPGC_TLI_keystone')
+            keystone_trial = Trial.objects.get(name='FAB_TLI_keystone')
+            strip_trial = Trial.objects.get(name='FAB_TLI_strip_plot')
             years = [2024, 2025, 2026, 2027]
             for year in years:
                 trial_year = TrialYear(
-                    trial_id=fab_trial, 
+                    trial_id=keystone_trial, 
+                    year=year)
+                trial_year.full_clean()
+                trial_year.save()
+
+                trial_year = TrialYear(
+                    trial_id=strip_trial, 
                     year=year)
                 trial_year.full_clean()
                 trial_year.save()
@@ -300,18 +470,37 @@ class Command(BaseCommand):
         
         # Populate TrialTreatments
         if not TrialTreatment.objects.exists():
-            trial = Trial.objects.get(name='FABPGC_TLI_keystone')
+            keystone_trial = Trial.objects.get(name='FAB_TLI_keystone')
             treatments = Treatment.objects.all()
             for tr in treatments:
                 TrialTreatment.objects.create(
-                    trial_id = trial,
+                    trial_id = keystone_trial,
                     treatment_id = tr
                 )
+            
+            strip_trial = Trial.objects.get(name='FAB_TLI_strip_plot')
+            treatment = Treatment.objects.get(name='FABPGC PGC')
+            TrialTreatment.objects.create(
+                trial_id = strip_trial,
+                treatment_id = treatment
+            )
 
         # Populate Plots
         if not Plot.objects.exists():
-            trial = Trial.objects.get(name='FABPGC_TLI_keystone')
-            plot_list = pd.read_csv('data_storage/keystone_plot_list.csv')
+            column_dict = {
+                'block': 'string',
+                'label': 'string',
+                'type': 'string',
+                'width_m': 'float64',
+                'length_m': 'float64',
+                'parent_plot_id': 'string',
+                'row': 'string',
+                'column': 'string'
+            }
+
+            keystone_trial = Trial.objects.get(name='FAB_TLI_keystone')
+            plot_list = pd.read_csv('data_storage/tli_keystone.csv', dtype=column_dict)
+            print(plot_list)
             nrow = len(plot_list)
             for i in range(nrow):
                 row = plot_list.loc[i]
@@ -320,14 +509,39 @@ class Command(BaseCommand):
                 except Plot.DoesNotExist:
                     parent_plot = None
                 Plot.objects.create(
-                    trial_id=trial, 
+                    trial_id=keystone_trial, 
                     block=row.block,
                     label=row.label,
                     type=row.type,
                     width_m=row.width_m,
                     length_m=row.length_m,
-                    parent_plot_id=parent_plot
+                    parent_plot_id=parent_plot,
+                    row=None if pd.isna(row.row) else row.row,
+                    column=None if pd.isna(row.column) else row.column
                 )
+
+            strip_trial = Trial.objects.get(name='FAB_TLI_strip_plot')
+            plot_list = pd.read_csv('data_storage/tli_strip_plot.csv' , dtype=column_dict)
+            nrow = len(plot_list)
+            for i in range(nrow):
+                row = plot_list.loc[i]
+                try:
+                    parent_plot = Plot.objects.get(label=row.parent_plot_id)
+                except Plot.DoesNotExist:
+                    parent_plot = None
+                Plot.objects.create(
+                    trial_id=strip_trial, 
+                    block=row.block,
+                    label=row.label,
+                    type=row.type,
+                    width_m=row.width_m,
+                    length_m=row.length_m,
+                    parent_plot_id=parent_plot,
+                    row=None if pd.isna(row.row) else row.row,
+                    column=None if pd.isna(row.column) else row.column
+                )
+
+            
         
         # Populate SOP Table
         if not SopDocument.objects.exists():
@@ -350,5 +564,90 @@ class Command(BaseCommand):
                 CommonName.objects.create(
                     name=name
                 )
+
+        # Populate AWS Model Pipeline
+        if not AwsModel.objects.exists():
+            
+            # Create marker detection model
+            AwsModel.objects.create(
+                name="PGC_ROI_marker_detection_model",
+                version="0.1.0",
+                description="An EfficientDet object detection model used to localize PGC plot ROI markers in the field.",
+                endpoint_url="https://pgcview.org/api/v1/predict_markers"
+            )
+
+            # Create PGC segmentation model
+            AwsModel.objects.create(
+                name="PGC_segmentation_model",
+                version="0.1.0",
+                description="A DeepLabV3+ semantic segmentation model used to predict and classify all pixels within the image area.",
+                endpoint_url="https://pgcview.org/api/v1/predict_pgc"
+            )
+
+         # Populate Ontology objects
+        if not TraitEntity.objects.exists():
+
+            # Create TraitEntity table objects
+            trait_entity = pl.read_excel('data_storage/TraitEntity.xlsx')
+            for row in trait_entity.rows():
+                TraitEntity.objects.create(
+                    label=row[0],
+                    abbreviation=row[1],
+                    external_ontology_reference=row[2]
+                )
+        if not TraitAttribute.objects.exists():
+
+            # Create TraitAttribute table objects
+            trait_attribute = pl.read_excel('data_storage/TraitAttribute.xlsx')
+            for row in trait_attribute.rows():
+                TraitAttribute.objects.create(
+                    label=row[0],
+                    abbreviation=row[1],
+                    external_ontology_reference=row[2]
+                )
+
+        if not VarTrait.objects.exists():
+
+            # Create VarTrait table objects
+            var_trait = pl.read_excel('data_storage/VarTrait.xlsx')
+            for row in var_trait.rows():
+                entity = TraitEntity.objects.get(label=row[2])
+                attribute = TraitAttribute.objects.get(label=row[3])
+                VarTrait.objects.create(
+                    label=row[0],
+                    abbreviation=row[1],
+                    entity_id=entity,
+                    attribute_id=attribute
+                )
+
+        if not VarMethod.objects.exists():
+
+            # Create VarMethod table objects
+            var_method = pl.read_excel('data_storage/VarMethod.xlsx')
+            for row in var_method.rows():
+                VarMethod.objects.create(
+                    label=row[0],
+                    abbreviation=row[1]
+                )
+            
+        if not VarScale.objects.exists():
+
+            # Create VarScale table objects
+            var_scale = pl.read_excel('data_storage/VarScale.xlsx')
+            for row in var_scale.rows():
+                print(row)
+                ordered = True if row[2] is not None else False
+                VarScale.objects.create(
+                    label=row[0],
+                    abbreviation=row[1],
+                    external_ontology_reference=row[5],
+                    is_ordered=row[3],
+                    type = row[2]
+                )
+
+            # Create Variable table objects
+            variable = pl.read_excel('data_storage/Variable.xlsx')
+
+
 
         self.stdout.write(self.style.SUCCESS('Successfully populated initial data'))

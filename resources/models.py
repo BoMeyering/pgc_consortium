@@ -4,6 +4,8 @@ Resource Level Models
 from django.db import models
 from django.urls import reverse
 from django.core.validators import RegexValidator
+from django.utils.text import slugify
+from django.utils.html import format_html
 
 # External imports
 from phonenumber_field.modelfields import PhoneNumberField
@@ -85,6 +87,9 @@ class Address(models.Model):
         ]
     )
 
+    class Meta:
+        verbose_name_plural = "Addresses"
+
     def __str__(self):
         return f"{self.address_line_1}, {self.city}, {self.state_id.name} {self.postal_code}"
 
@@ -108,6 +113,12 @@ class Organization(models.Model):
         unique=True
     )
     logo_url = models.CharField(max_length=255, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -122,9 +133,16 @@ class Person(models.Model):
     last_name = models.CharField(max_length=255, blank=False, null=False)
     middle_initial = models.CharField(max_length=1)
     affiliation_id = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    role = models.CharField(max_length=255, blank=False, null=False)
     orcid = models.CharField(max_length=19, blank=True, null=True)
     email = models.EmailField(unique=True, blank=True, null=True)
     phone_number = PhoneNumberField(blank=True, null=False)
+    slug = models.SlugField(unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify([self.first_name, self.last_name])
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.last_name}, {self.first_name} - {self.affiliation_id}"
@@ -136,8 +154,20 @@ class Project(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='proj_')
     name = models.CharField(unique=True, null=False)
     description = models.TextField(blank=False, null=False)
-    funding = models.CharField(max_length=255)
-    website = models.URLField(blank=True)
+    funding = models.CharField(max_length=255, help_text='Fill in the funding agency, and grant number if applicable.')
+    website = models.URLField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    slug = models.SlugField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'slug'], name='project_unique_constraint')
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def truncate_description(self):
         """Return a truncated description for displaying in the admin page"""

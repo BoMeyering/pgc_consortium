@@ -1,0 +1,4 @@
+block,label,type,width_m,length_m,parent_plot_id,row,column
+1,b1_p1,main plot,6.096,97.536,,1,1
+1,b1_p2,main plot,6.096,97.536,,1,2
+1,b1_p3,main plot,6.096,97.536,,1,3

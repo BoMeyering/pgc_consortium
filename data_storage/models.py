@@ -40,10 +40,11 @@ class Trial(models.Model):
         limit_choices_to={'type': 'trial'}
     )
     manager_id = models.ForeignKey('resources.Person', blank=False, null=False, on_delete=models.CASCADE)
-    project_id = models.ForeignKey('resources.Project', blank=False, null=False, on_delete=models.CASCADE)
+    project_id = models.ForeignKey('resources.Project', blank=False, null=False, on_delete=models.CASCADE, related_name='project_trials')
     affiliation_id = models.ForeignKey('resources.Organization', blank=False, null=False, on_delete=models.CASCADE)
     establishment_year = models.IntegerField(choices=YearEnum.choices, default=date.today().year)
     multi_year = models.BooleanField(default=False, blank=False, null=False)
+    experimental_unit_level = models.CharField(choices=PlotType, blank=False, null=False)
 
     def __str__(self):
         return self.name
@@ -185,6 +186,9 @@ class Germplasm(models.Model):
     genus = models.CharField(max_length=255, blank=False, null=False)
     species = models.CharField(max_length=255, blank=False, default='spp.')
 
+    class Meta:
+        verbose_name_plural = "Germplasm"
+
     def __str__(self):
         return f"{self.type} {self.common_name_id} - {self.name}"
 
@@ -198,6 +202,7 @@ class GermplasmAlias(models.Model):
     alias = models.CharField(max_length=255)
 
     class Meta:
+        verbose_name_plural = "Germplasm aliases"
         constraints = [
             models.UniqueConstraint(fields=['germplasm_id', 'alias'], name='germplasm_alias_composite_key')
         ]
@@ -256,6 +261,15 @@ class Plot(models.Model):
             models.UniqueConstraint(fields=['trial_id', 'label'], name='plot_trial_unique_constraint')
         ]
 
+    def clean(self):
+        super().clean()
+
+        EU_LEVEL = self.trial_id.experimental_unit_level
+        if self.type != EU_LEVEL and (self.row or self.column):
+            raise ValidationError(
+                {'type': _(f"Row and column information should only be set for plots that are at the experimental unit level ({EU_LEVEL}). This plot is a {self.type}.")}
+            )
+
     def __str__(self):
         return f"{self.trial_id.name} - {self.label} "
     
@@ -304,7 +318,40 @@ class PlotTreatment(models.Model):
         return f"{self.plot_crop_id.plot_id.label} - {self.plot_crop_id.plot_year}: {self.treatment_level_id.level}"
 
 """ Observation Models """
-class Observation(models.Model):
+class CropObservation(models.Model):
+    """
+    Observation model to connect observations with Person(s) PlotCrop records, and variables
+    FK1 on Person
+    FK2 on PlotCrop
+    FK3 on Variable
+    """
+    db_id = KsuidField(primary_key=True, editable=False, prefix='observation_')
+    date_time = models.DateTimeField(blank=False, null=False)
+    observer_id = models.ForeignKey('resources.Person', on_delete=models.CASCADE, blank=False, null=False)
+    plot_crop_id = models.ForeignKey(PlotCrop, on_delete=models.CASCADE, blank=False, null=False)
+    variable_id = models.ForeignKey('ontology.Variable', to_field='label', on_delete=models.CASCADE)
+    value = models.CharField(max_length=255, null=False)
+
+    def clean(self):
+        super().clean()
+
+        variable = self.variable_id
+
+        if variable.min_value:
+            if self.value < variable.min_value:
+                raise ValidationError(
+                    {'value': _(f"The observation value cannot be less than the variable {variable}'s minimum allowed value ({variable.min_value})")}
+                )
+        if variable.max_value:
+            if self.value > variable.max_value:
+                raise ValidationError(
+                    {'value': _(f"The observation value cannot be less than the variable {variable}'s maximum allowed value ({variable.max_value})")}
+                )
+
+    def __str__(self):
+        return f"{self.plotId} - {self.variable}: {self.value}"
+    
+class SoilObservation(models.Model):
     """
     Observation model to connect observations with Person(s) PlotCrop records, and variables
     FK1 on Person

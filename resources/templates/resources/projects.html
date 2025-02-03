@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}List SOPs{% endblock %}
+{% block title %}Projects{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container border-bottom py-4">
     <h1>
-        Well, this is embarassing...
+        Projects
     </h1>
     <p>
         We haven't had a chance to fill this out yet
@@ -21,4 +22,92 @@
         Posuere felis pellentesque nostra odio tellus sit. Lacinia mattis molestie metus nostra; ad ac varius fermentum. Sagittis hendrerit senectus justo vestibulum pharetra pulvinar lacinia. Facilisi suscipit euismod vehicula senectus arcu, faucibus ac. Accumsan tellus a, cras dictum ullamcorper nam ornare fermentum. Montes rutrum vehicula augue nulla cras vulputate. Dui rhoncus per fames himenaeos faucibus; ligula interdum dui. Facilisis aliquet commodo felis mattis; facilisis blandit? Amet phasellus parturient auctor euismod egestas pharetra.
     </p>
 </div>
+<div class="container border-bottom p-4 pb-5">
+    <h2 class="text-center">Active Projects</h2>
+    {% if active_projects %}
+        <div class="row row-cols-1 row-cols-md-4 justify-content-center g-4">
+            {% for project in active_projects %}
+            <div class="col">
+                <div class="card h-100 text-center my-3 hovereffect">
+                    <div class="card-body">
+                        <a class="nav-link link-light" href="{% url 'resources:project_detail' project.slug %}">
+                            <h5 class="card-title">
+                                {{ project.name }}
+                            </h5>
+                        </a>
+                        <p class="card-text">{{ project.truncate_description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="container justify-content-center">
+            <p class="text-center">
+                <em>
+                    Looks like there aren't any active projects right now.
+                </em>
+            </p>
+        </div>
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-secondary align-items-center" href="{% url 'resources:create_project' %}">
+                Create New Project
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="container border-bottom p-4 pb-5">
+    <h2 class="m-3 text-center">
+        Inactive Projects
+    </h2>
+    {% if inactive_projects %}
+        <div class="row row-cols-1 row-cols-md-4 justify-content-center g-4">
+            {% for project in inactive_projects %}
+            <div class="col">
+                <div class="card h-100 text-center my-3 hovereffect">
+                    <div class="card-body">
+                        <a class="nav-link link-light" href="{% url 'resources:project_detail' project.slug %}">
+                            <h5 class="card-title">
+                                {{ project.name }}
+                            </h5>
+                        </a>
+                        <p class="card-text">{{ project.truncate_description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="container justify-content-center">
+            <p class="text-center">
+                <em>
+                    Looks like there aren't any active projects right now.
+                </em>
+            </p>
+        </div>
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-secondary align-items-center" href="{% url 'resources:create_project' %}">
+                Create New Project
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% if active_projects and inactive_projects %}
+    <div class="container border-bottom p-4 pb-5">
+        
+            <div class="container justify-content-center">
+                <p class="text-center">
+                    <em>
+                        Don't see your project listed here?
+                    </em>
+                </p>
+            </div>
+            <div class="d-flex justify-content-center">
+                <a class="btn btn-secondary align-items-center" href="{% url 'resources:create_project' %}">
+                    Create New Project
+                </a>
+            </div>
+    </div>
+{% endif %}
 {% endblock %}

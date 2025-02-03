@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Project Detail{% endblock %}
+
+{% block content %}
+<h1>
+    {{ project.name }}
+</h1>
+{% if project_trials %}
+    {% for trial in project_trials %}
+        <h2>
+            {{ trial.name }}
+        </h2>
+    {% endfor %}
+{% else %}
+    <div class="container justify-content-center">
+        <p class="text-center">
+            <em>
+                Looks like there aren't any trials associated with this project right now.
+            </em>
+        </p>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a class="btn btn-secondary align-items-center" href="{% url 'data_storage:create_trial' %}?project={{ project.slug }}">
+            Create New Trial
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

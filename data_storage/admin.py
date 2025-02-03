@@ -5,7 +5,7 @@ from .models import Trial, TrialYear, TrialAttribute, TrialEvent
 from .models import Treatment, TreatmentLevel, TrialTreatment
 from .models import CommonName, Germplasm, GermplasmAlias
 from .models import Plot, PlotCrop, PlotTreatment
-from .models import Observation
+from .models import CropObservation, SoilObservation
 
 from config.filters import ManagerFilter, TrialYearFilter, PlotCropFilter
 
@@ -54,10 +54,10 @@ admin.site.register(GermplasmAlias)
 """ Plot Models """
 @admin.register(Plot)
 class PlotAdmin(admin.ModelAdmin):
-    list_display = ['label', 'trial_id', 'block', 'type', 'width_m', 'length_m', 'parent_plot_id', 'location_id']
-    list_filter = ['trial_id', 'block', 'type', 'parent_plot_id']
+    list_display = ['trial_id', 'label', 'type', 'block', 'row', 'column', 'width_m', 'length_m', 'parent_plot_id', 'location_id']
+    list_filter = ['trial_id', 'block', 'row', 'column', 'type', 'parent_plot_id']
     search_fields = ['trial_id', 'label', 'location_id']
-    ordering = ['trial_id', 'label', 'type']
+    ordering = ['trial_id', 'label', 'type', 'block', 'row', 'column']
 
 @admin.register(PlotCrop)
 class PlotCropAdmin(admin.ModelAdmin):
@@ -69,4 +69,5 @@ class PlotCropAdmin(admin.ModelAdmin):
 admin.site.register(PlotTreatment)
 
 """ Observation Models """
-admin.site.register(Observation)
+admin.site.register(CropObservation)
+admin.site.register(SoilObservation)
