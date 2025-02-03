@@ -1,0 +1,66 @@
+{
+    "TraitEntity": [
+        {
+            "label": "<entity label>",
+            "abbreviation": "<entity abbreviation>",
+            "description": "<free text description>",
+            "external_ontology_reference": "<url to external ontology or reference>"
+        }
+    ],
+    "TraitAttribute": [
+        {
+            "label": "<attribute label>",
+            "abbreviation": "<entity abbreviation>",
+            "description": "<free text description>",
+            "external_ontology_reference": "<url to external ontology or reference>"
+        }
+    ],
+    "VarTrait": [
+        {
+            "label": "<trait label>",
+            "abbreviation": "<trait abbreviation>",
+            "description": "<free text description>",
+            "entityId": "<entity label>",
+            "attributeId": "<attribute label>",
+            "external_ontology_reference": "<url to external ontology or reference>"
+        }
+    ],
+    "VarScale": [
+        {
+            "label": "<scale label",
+            "abbreviation": "<scale abbreviation>",
+            "description": "<free text description>",
+            "is_ordered": "<true or false>",
+            "type": "<one of [date, duration, nominal, ordinal, float, integer, proportion, percentage]>",
+            "external_ontology_reference": "<url to external ontology or reference>"
+        }
+    ],
+    "VarMethod": [
+        {
+            "label": "<method label>",
+            "abbreviation": "<method abbreviation>",
+            "description": "<free text description>",
+            "external_ontology_reference": "<url to external ontology or reference>"
+        }
+    ],
+    "Variable": [
+        {
+            "label": "<variable label>",
+            "abbreviation": "<variable abbreviation>",
+            "decription": "<free text description>",
+            "min_value": "<minimum float or integer value, otherwise blank>",
+            "max_value": "<maximum float or integer value, otherwise blank>",
+            "trait_id": "<trait label>",
+            "method_id": "<method label>",
+            "scale_id": "<scale label>",
+            "type": "<one of [corn, soybean, pgc_grass, pgc_clover, weed, soil]>"
+        }
+    ],
+    "ScaleValue": [
+        {
+            "label": "<scale value label>",
+            "description": "<free text description>",
+            "order": "<integer of the order of the value if VarScale.is_ordered == true. Increments from 1-n where {n-1 < n}>",
+            "scale_id": "<scale label>"
+        }
+}

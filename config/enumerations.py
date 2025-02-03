@@ -27,10 +27,11 @@ class ScaleType(models.TextChoices):
     DATE = 'date', 'Date'
     DURATION = 'duration', 'Duration'
     NOMINAL = 'nominal', 'Nominal'
-    NUMERICAL = 'numerical', 'Numerical'
     ORDINAL = 'ordinal', 'Ordinal'
-    COUNT = 'count', 'Count'
-
+    FLOAT = 'numerical', 'Numerical'
+    INTEGER = 'integer', 'Integer'
+    PROPORTION = 'proportion', 'Proportion'
+    PERCENTAGE = 'percentage', 'Percentage'
     
 class StatusType(models.TextChoices):
     """

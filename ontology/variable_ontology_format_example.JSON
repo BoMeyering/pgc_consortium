@@ -1,0 +1,384 @@
+{
+    "TraitEntity": [
+        {
+            "label": "plant",
+            "abbreviation": "Pl",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "grain",
+            "abbreviation": "Gr",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "soil",
+            "abbreviation": "So",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "groundcover",
+            "abbreviation": "Pgc",
+            "description": "",
+            "external_ontology_reference": ""
+        }
+    ],
+    "TraitAttribute": [
+        {
+            "label": "height",
+            "abbreviation": "H",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "depth",
+            "abbreviation": "D",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "moisture content",
+            "abbreviation": "MC",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "volumetric water content",
+            "abbreviation": "VWC",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "count",
+            "abbreviation": "Ct",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "yield",
+            "abbreviation": "Yld",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "aboveground biomass",
+            "abbreviation": "AgBm",
+            "description": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "coverage",
+            "abbreviation": "Cov",
+            "description": "",
+            "external_ontology_reference": ""
+        }
+    ],
+    "VarTrait": [
+        {
+            "label": "plant height",
+            "abbreviation": "Pl_H",
+            "description": "",
+            "entityId": "plant",
+            "attributeId": "height",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "plant aboveground biomass",
+            "abbreviation": "Pl_AgBm",
+            "description": "",
+            "entityId": "plant",
+            "attributeId": "aboveground biomass",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "grain yield",
+            "abbreviation": "Gr_Yld",
+            "description": "",
+            "entityId": "grain",
+            "attributeId": "yield",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "groundcover coverage",
+            "abbreviation": "Pgc_Cov",
+            "description": "",
+            "entityId": "groundcover",
+            "attributeId": "coverage",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "groundcover height",
+            "abbreviation": "Pgc_H",
+            "description": "",
+            "entityId": "groundcover",
+            "attributeId": "height",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "soil volumetric water content",
+            "abbreviation": "So_VWC",
+            "description": "",
+            "entityId": "soil",
+            "attributeId": "volumetric water content",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "grain moisture content",
+            "abbreviation": "Gr_MC",
+            "description": "",
+            "entityId": "grain",
+            "attributeId": "moisture content",
+            "external_ontology_reference": ""
+        }
+    ],
+    "VarScale": [
+        {
+            "label": "centimeters",
+            "abbreviation": "cm",
+            "description": "",
+            "is_ordered": false,
+            "type": "numerical",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "kilograms",
+            "abbreviation": "kg",
+            "description": "",
+            "is_ordered": false,
+            "type": "numerical",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "kilograms per hectare",
+            "abbreviation": "kg/Ha",
+            "description": "",
+            "is_ordered": false,
+            "type": "numerical",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "proportion",
+            "abbreviation": "prop",
+            "description": "",
+            "is_ordered": false,
+            "type": "proportion",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "percentage",
+            "abbreviation": "pct",
+            "description": "",
+            "is_ordered": false,
+            "type": "percentage",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "file",
+            "abbreviation": "file",
+            "description": "",
+            "is_ordered": false,
+            "type": "",
+            "external_ontology_reference": ""
+        },
+        {
+            "label": "maize growth stage",
+            "abbreviation": "MGrStg",
+            "description": "",
+            "is_ordered": true,
+            "type": "ordinal",
+            "external_ontology_reference": ""
+        }
+    ],
+    "VarMethod": [
+        {
+            "label": "generic method",
+            "abbreviation": "GM",
+            "description": "",
+            "external_ontology_reference": ""
+        }
+    ],
+    "Variable": [
+        {
+            "label": "plant height [cm]",
+            "abbreviation": "Pl_H_cm",
+            "decription": "",
+            "min_value": "0",
+            "max_value": "400",
+            "trait_id": "plant height",
+            "method_id": "general method",
+            "scale_id": "centimeters",
+            "type": "corn"
+        },
+        {
+            "label": "plant aboveground biomass [kg]",
+            "abbreviation": "Pl_AgBm_kg",
+            "decription": "",
+            "min_value": "0",
+            "max_value": "",
+            "trait_id": "plant aboveground biomass",
+            "method_id": "general method",
+            "scale_id": "kilograms",
+            "type": "corn"
+        },
+        {
+            "label": "grain yield [kg/Ha]",
+            "abbreviation": "Gr_Yld_kg/Ha",
+            "decription": "",
+            "min_value": "0",
+            "max_value": "",
+            "trait_id": "grain yield",
+            "method_id": "general method",
+            "scale_id": "kilograms per hectare",
+            "type": "corn"
+        },
+        {
+            "label": "groundcover coverage [prop]",
+            "abbreviation": "Pgc_Cov_prop",
+            "decription": "",
+            "min_value": "0",
+            "max_value": "1",
+            "trait_id": "groundcover coverage",
+            "method_id": "general method",
+            "scale_id": "proportion",
+            "type": "pgc_grass"
+        },
+        {
+            "label": "groundcover height [cm]",
+            "abbreviation": "Pgc_H_cm",
+            "decription": "",
+            "min_value": "0",
+            "max_value": "",
+            "trait_id": "groundcover height",
+            "method_id": "general method",
+            "scale_id": "centimeters",
+            "type": "pgc_grass"
+        },
+        {
+            "label": "soil volumetric water content [pct]",
+            "abbreviation": "So_VWC_pct",
+            "decription": "",
+            "min_value": "0",
+            "max_value": "100",
+            "trait_id": "soil volumetric water content",
+            "method_id": "general method",
+            "scale_id": "kpercentage",
+            "type": "corn"
+        },
+        {
+            "label": "grain moisture content [pct]",
+            "abbreviation": "Gr_MC_pct",
+            "decription": "",
+            "min_value": "0",
+            "max_value": "",
+            "trait_id": "grain moisture content",
+            "method_id": "general method",
+            "scale_id": "percentage",
+            "type": "corn"
+        }
+    ],
+    "ScaleValue": [
+        {
+            "label": "VE",
+            "description": "Emergence - shoot (coleoptile) has emerged from the soil",
+            "order": 1,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V1",
+            "description": "First leaf - lowest leaf has a visible collar; this leaf has a rounded tip",
+            "order": 2,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V2",
+            "description": "Second leaf - two of the lowest leaves have a visible collar, the second and subsequent leaves have pointed tips",
+            "order": 3,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V3",
+            "description": "Third leaf - 3 leaf collars present.",
+            "order": 4,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V4",
+            "description": "Fourth leaf - 4 leaf collars present.",
+            "order": 5,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V5",
+            "description": "Fifth leaf - 5 leaf collars present.",
+            "order": 6,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V6",
+            "description": "Sixth leaf - 6 leaf collars present.",
+            "order": 7,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V7",
+            "description": "Seventh leaf - 7 leaf collars present.",
+            "order": 8,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V8",
+            "description": "Eighth leaf - 8 leaf collars present.",
+            "order": 9,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "V9",
+            "description": "Ninth leaf - 9 leaf collars present.",
+            "order": 10,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "VT",
+            "description": "Tassel - lowest branch of the tassel is visible",
+            "order": 11,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "R1",
+            "description": "Silk - one or more silks extends outside of husk leaves",
+            "order": 12,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "R2",
+            "description": "Blister - kernels resemble “blisters” with clear liquid",
+            "order": 13,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "R3",
+            "description": "Milk - kernels filled with “milky” fluid",
+            "order": 14,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "R4",
+            "description": "Dough - inside the kernels are a “doughy” consistency",
+            "order": 15,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "R5",
+            "description": "Dent - dent forms on kernel and milk line progresses towards kernel tip",
+            "order": 16,
+            "scale_id": "maize growth stage"
+        },
+        {
+            "label": "R6",
+            "description": "Physiological maturity – kernels at maximum dry matter accumulation; a “black layer” will form at kernel base (2-3 days after physiological maturity)",
+            "order": 17,
+            "scale_id": "maize growth stage"
+        }
+}

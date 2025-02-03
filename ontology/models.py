@@ -18,6 +18,7 @@ class TraitEntity(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='traitEntity_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     abbreviation = models.CharField(max_length=30, unique=True, blank=False, null=False)
+    description = models.TextField(max_length=500, unique=False, blank=True, null=True)
     external_ontology_reference = models.URLField(null=True, blank=True)
     
     class Meta:
@@ -33,6 +34,7 @@ class TraitAttribute(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='traitAttr_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     abbreviation = models.CharField(max_length=30, unique=True, blank=False, null=False)
+    description = models.TextField(max_length=500, unique=False, blank=True, null=True)
     external_ontology_reference = models.URLField(null=True, blank=True)
     
     def __str__(self):
@@ -47,6 +49,7 @@ class VarTrait(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='varTrait_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     abbreviation = models.CharField(max_length=50, unique=True, blank=False, null=False)
+    description = models.TextField(max_length=500, unique=False, blank=True, null=True)
     entity_id = models.ForeignKey(TraitEntity, on_delete=models.CASCADE, blank=False, null=False)
     attribute_id = models.ForeignKey(TraitAttribute, on_delete=models.CASCADE, blank=False, null=False)
     external_ontology_reference = models.URLField(null=True, blank=True)
@@ -61,7 +64,7 @@ class VarMethod(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='varMethod_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     abbreviation = models.CharField(max_length=50, unique=True, blank=False, null=False)
-    description = models.TextField(max_length=500)
+    description = models.TextField(max_length=500, unique=False, blank=True, null=True)
     external_ontology_reference = models.URLField(null=True, blank=True)
     
     def __str__(self):
@@ -74,7 +77,7 @@ class VarScale(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='varScale_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     abbreviation = models.CharField(max_length=50, unique=True, blank=False, null=False)
-    description = models.TextField(max_length=500)
+    description = models.TextField(max_length=500, unique=False, blank=True, null=True)
     is_ordered = models.BooleanField(blank=False, null=False)
     type = models.CharField(max_length=50, choices=ScaleType, blank=False, null=False)
     external_ontology_reference = models.URLField(null=True, blank=True)
@@ -88,7 +91,7 @@ class ScaleValue(models.Model):
     """
     db_id = KsuidField(primary_key=True, editable=False, prefix='scaleValue_')
     label = models.CharField(max_length=255, unique=False, blank=False, null=False)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(max_length=500, unique=False, blank=True, null=True)
     order = models.IntegerField(null=True, blank=True)
     var_scale = models.ForeignKey(
         VarScale, 
@@ -161,11 +164,12 @@ class Variable(models.Model):
     db_id = KsuidField(primary_key=True, editable=False, prefix='variable_')
     label = models.CharField(max_length=255, unique=True, blank=False, null=False)
     abbreviation = models.CharField(max_length=255, unique=True, blank=False, null=False)
+    description = models.TextField(max_length=500, unique=False, blank=True, null=True)
+    min_value = models.FloatField(blank=True, null=True)
+    max_value = models.FloatField(blank=True, null=True)
     trait_id = models.ForeignKey(VarTrait, on_delete=models.CASCADE, blank=False, null=False)
     method_id = models.ForeignKey(VarMethod, on_delete=models.CASCADE, blank=False, null=False)
     scale_id = models.ForeignKey(VarScale, on_delete=models.CASCADE, blank=False, null=False)
-    min_value = models.FloatField(blank=True, null=True)
-    max_value = models.FloatField(blank=True, null=True)
     type = models.CharField(max_length=50, choices=VariableType, blank=False, null=False)
 
     class Meta:
